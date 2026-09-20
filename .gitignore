@@ -1,0 +1,24 @@
+# Build & Test Artifacts
+bin/
+.tmp/
+*.out
+coverage.*
+*.coverprofile
+profile.cov
+*.pprof
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+client_example
+
+# Test binary, built with `go test -c`
+*.test
+
+# Vortex generated mocks & harnesses
+*_mock.gen.go
+*_harness.gen.go
+.vortex/
