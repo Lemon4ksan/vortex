@@ -313,10 +313,10 @@ func emitSocketService(buf *bytes.Buffer, tracker *ImportTracker, _ *ir.RootIR, 
 	tracker.Add("errors")
 	tracker.Add("sync")
 	tracker.Add("sync/atomic")
-	tracker.Add("github.com/lemon4ksan/aoni/realtime/socket")
-	tracker.Add("github.com/lemon4ksan/aoni/realtime/socket/connector")
-	tracker.Add("github.com/lemon4ksan/aoni/realtime/socket/dispatcher")
-	tracker.Add("github.com/lemon4ksan/aoni/realtime/socket/processor")
+	tracker.Add("github.com/lemon4ksan/aoni-contrib/socket")
+	tracker.Add("github.com/lemon4ksan/aoni-contrib/socket/connector")
+	tracker.Add("github.com/lemon4ksan/aoni-contrib/socket/dispatcher")
+	tracker.Add("github.com/lemon4ksan/aoni-contrib/socket/processor")
 
 	clientStructName := lowerFirst(svc.Name) + "Impl"
 

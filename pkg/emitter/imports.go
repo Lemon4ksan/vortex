@@ -212,10 +212,10 @@ func (t *ImportTracker) RegisterRootImports(root *ir.RootIR, bodyCode string) {
 
 	if hasSocket {
 		t.Add("context")
-		t.Add("github.com/lemon4ksan/aoni/realtime/socket")
-		t.Add("github.com/lemon4ksan/aoni/realtime/socket/connector")
-		t.Add("github.com/lemon4ksan/aoni/realtime/socket/dispatcher")
-		t.Add("github.com/lemon4ksan/aoni/realtime/socket/processor")
+		t.Add("github.com/lemon4ksan/aoni-contrib/socket")
+		t.Add("github.com/lemon4ksan/aoni-contrib/socket/connector")
+		t.Add("github.com/lemon4ksan/aoni-contrib/socket/dispatcher")
+		t.Add("github.com/lemon4ksan/aoni-contrib/socket/processor")
 	}
 
 	// Standard library package detection based on body references
