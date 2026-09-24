@@ -56,7 +56,7 @@ func (s MergeSummary) HasChanges() bool {
 // Render formats a human-readable terminal report of the merge.
 func (s MergeSummary) Render(targetPath string) string {
 	var sb strings.Builder
-	fmt.Fprintf(&sb, "⚡ [vortex merge] Merging %q into %q\n", s.SpecSource, targetPath)
+	fmt.Fprintf(&sb, "◆ [vortex merge] Merging %q into %q\n", s.SpecSource, targetPath)
 
 	if s.SpecVersion != "" {
 		fmt.Fprintf(&sb, "  Upstream Spec Version: %s\n", s.SpecVersion)

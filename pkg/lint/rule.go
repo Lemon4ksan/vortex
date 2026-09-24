@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package lint provides a modular contract linter and diagnostic engine for aoni/vortex interfaces.
 package lint
 
 import (

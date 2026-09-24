@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package builder provides high-level programmatic compilation and file-watching routines for Vortex AST code generation.
 package builder
 
 import (

@@ -233,7 +233,7 @@ func (c *CmdBlame) Run(ctx context.Context, args []string, stdout, stderr io.Wri
 		contractTitle = fmt.Sprintf("%s (%s)", relFile, irRoot.Services[0].Name)
 	}
 
-	fmt.Fprintf(stdout, "⚡ Vortex Contract Provenance (%s)\n\n", filepath.ToSlash(contractTitle))
+	fmt.Fprintf(stdout, "◆ Vortex Contract Provenance (%s)\n\n", filepath.ToSlash(contractTitle))
 	fmt.Fprintf(
 		stdout,
 		"  %-5s  %-30s %-36s %s\n",

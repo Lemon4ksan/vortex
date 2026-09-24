@@ -336,7 +336,7 @@ func (c *Cmd) runSplit(
 		if dryRun {
 			fmt.Fprintf(
 				stdout,
-				"⚡ [vortex ast split] Dry-Run (%s -> %s & %s)\n",
+				"◆ [vortex ast split] Dry-Run (%s -> %s & %s)\n",
 				filepath.ToSlash(relSrc),
 				matchedIfaceName,
 				toInterface,
@@ -379,7 +379,7 @@ func (c *Cmd) runSplit(
 		if dryRun {
 			fmt.Fprintf(
 				stdout,
-				"⚡ [vortex ast split] Dry-Run (%s -> %s)\n",
+				"◆ [vortex ast split] Dry-Run (%s -> %s)\n",
 				filepath.ToSlash(relSrc),
 				filepath.ToSlash(relDest),
 			)

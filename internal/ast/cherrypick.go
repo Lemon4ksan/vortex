@@ -262,7 +262,7 @@ func (c *CmdCherryPick) Run(ctx context.Context, args []string, stdout, stderr i
 	relDest, _ := filepath.Rel(targetDir, destFile)
 
 	if *dryRunFlag {
-		fmt.Fprintf(stdout, "⚡ [vortex ast pick] Dry-Run AST Transplant (%s:%s -> %s)\n\n",
+		fmt.Fprintf(stdout, "◆ [vortex ast pick] Dry-Run AST Transplant (%s:%s -> %s)\n\n",
 			filepath.ToSlash(relSrc), targetSymbol, filepath.ToSlash(relDest))
 
 		if matchedMethod != nil {

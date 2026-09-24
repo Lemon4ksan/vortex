@@ -77,7 +77,7 @@ func (c *CmdReview) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 
 	p := vparser.NewParser()
 
-	fmt.Fprintf(stdout, "⚡ [vortex ast review] Auditing Proposal from %q\n\n", targetRef)
+	fmt.Fprintf(stdout, "◆ [vortex ast review] Auditing Proposal from %q\n\n", targetRef)
 
 	totalDeltas := 0
 

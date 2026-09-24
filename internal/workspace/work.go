@@ -133,7 +133,7 @@ func (c *CmdWork) runStatus(_ context.Context, stdout, _ io.Writer) error {
 	}
 
 	doc := text.NewDocument().
-		Title("⚡", "Vortex Workspace Orchestrator").
+		Title("◆", "Vortex Workspace Orchestrator").
 		Field("Work File", fmt.Sprintf("%s (%d workspaces linked)", wc.WorkPath, len(wc.Workspaces)))
 	defer doc.Release()
 
@@ -145,7 +145,7 @@ func (c *CmdWork) runStatus(_ context.Context, stdout, _ io.Writer) error {
 
 		cfg, lErr := project.Load(wsPath)
 		if lErr != nil || cfg == nil {
-			rows = append(rows, []string{ws, "-", "-", "⚠️ Missing config"})
+			rows = append(rows, []string{ws, "-", "-", "▲ Missing config"})
 			continue
 		}
 
@@ -184,7 +184,7 @@ func (c *CmdWork) runForward(ctx context.Context, targetCmd string, args []strin
 
 	fmt.Fprintf(
 		stdout,
-		"⚡ Vortex Multi-Repo Execution: running %q across %d workspaces\n",
+		"◆ Vortex Multi-Repo Execution: running %q across %d workspaces\n",
 		targetCmd,
 		len(wc.Workspaces),
 	)
@@ -196,7 +196,7 @@ func (c *CmdWork) runForward(ctx context.Context, targetCmd string, args []strin
 	for i, ws := range wc.Workspaces {
 		wsPath := filepath.Join(wc.WorkDir, filepath.FromSlash(ws))
 		if _, statErr := os.Stat(wsPath); statErr != nil {
-			fmt.Fprintf(stderr, "[%d/%d] %s ........... ⚠️ Directory not found\n", i+1, len(wc.Workspaces), ws)
+			fmt.Fprintf(stderr, "[%d/%d] %s ........... ▲ Directory not found\n", i+1, len(wc.Workspaces), ws)
 			continue
 		}
 
@@ -214,7 +214,7 @@ func (c *CmdWork) runForward(ctx context.Context, targetCmd string, args []strin
 		_ = os.Chdir(origWd)
 
 		if runErr != nil {
-			fmt.Fprintf(stderr, "❌ [%s] failed: %v\n\n", ws, runErr)
+			fmt.Fprintf(stderr, "✖ [%s] failed: %v\n\n", ws, runErr)
 		} else {
 			successCount++
 
@@ -227,7 +227,7 @@ func (c *CmdWork) runForward(ctx context.Context, targetCmd string, args []strin
 	fmt.Fprintf(stdout, "─────────────────────────────────────────────────────────────────────────────\n")
 	fmt.Fprintf(
 		stdout,
-		"✨ Multi-Repo Pipeline: %d/%d workspaces completed successfully in %s!\n\n",
+		"✔ Multi-Repo Pipeline: %d/%d workspaces completed successfully in %s!\n\n",
 		successCount,
 		len(wc.Workspaces),
 		elapsed,

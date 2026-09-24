@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package diff implements semantic contract drift analysis between local Go interfaces and OpenAPI specifications.
-// Core data models are located in [github.com/lemon4ksan/foundation/text/diff].
 package diff
 
 import (

@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package spec provides the definitive, self-documenting registry of all DSL directives,
-// arguments, scopes, pipeline stages, and validation rules for aoni-gen.
 package spec
 
 import (

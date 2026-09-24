@@ -118,7 +118,7 @@ func (c *CmdAutoPilot) Run(ctx context.Context, _ []string, stdout, stderr io.Wr
 	// If all contracts are missing or no contracts exist
 	if len(activeContracts) == 0 {
 		if len(missingContracts) > 0 {
-			fmt.Fprintf(stderr, "❌ [Vortex Auto-Pilot] Configured contract file(s) not found on disk:\n")
+			fmt.Fprintf(stderr, "✖ [Vortex Auto-Pilot] Configured contract file(s) not found on disk:\n")
 
 			for _, m := range missingContracts {
 				fmt.Fprintf(stderr, "  • %s\n", m)
@@ -126,7 +126,7 @@ func (c *CmdAutoPilot) Run(ctx context.Context, _ []string, stdout, stderr io.Wr
 
 			fmt.Fprintf(
 				stderr,
-				"\n👉 Tip: Run 'vortex spec import -spec=<file> -out=<target>' or check contract paths in .vortex.yml\n",
+				"\n↳ Tip: Run 'vortex spec import -spec=<file> -out=<target>' or check contract paths in .vortex.yml\n",
 			)
 
 			return errors.New("configured contracts missing from disk")
@@ -136,7 +136,7 @@ func (c *CmdAutoPilot) Run(ctx context.Context, _ []string, stdout, stderr io.Wr
 	}
 
 	if len(missingContracts) > 0 {
-		fmt.Fprintf(stderr, "⚠️  [Warning] Skipping missing contract(s) declared in .vortex.yml:\n")
+		fmt.Fprintf(stderr, "▲ [Warning] Skipping missing contract(s) declared in .vortex.yml:\n")
 
 		for _, m := range missingContracts {
 			fmt.Fprintf(stderr, "  • %s\n", m)
@@ -151,7 +151,7 @@ func (c *CmdAutoPilot) Run(ctx context.Context, _ []string, stdout, stderr io.Wr
 
 // WORLD 1: Interactive Onboarding & Guided Scaffolding
 func (c *CmdAutoPilot) runWorld1Onboarding(ctx context.Context, cwd string, stdout, stderr io.Writer) error {
-	fmt.Fprintln(stdout, "⚡ Vortex — Unified Zero-Allocation AST Toolchain")
+	fmt.Fprintln(stdout, "◆ Vortex — Unified Zero-Allocation AST Toolchain")
 	fmt.Fprintln(stdout)
 	fmt.Fprintln(stdout, "No @aoni contracts or .vortex.yml found in this workspace.")
 	fmt.Fprintln(stdout)
@@ -169,10 +169,10 @@ func (c *CmdAutoPilot) runWorld1Onboarding(ctx context.Context, cwd string, stdo
 	}
 
 	fmt.Fprintln(stdout, "? What would you like to do?")
-	fmt.Fprintln(stdout, "  [1] 🚀 Scaffold a new API contract (HTTP / REST, WebSocket, Socket)")
-	fmt.Fprintln(stdout, "  [2] 📦 Ingest existing API (from OpenAPI, Swagger URL, Postman, or HAR)")
-	fmt.Fprintln(stdout, "  [3] ⚙️  Initialize empty .vortex.yml configuration")
-	fmt.Fprintln(stdout, "  [4] 📖 Print command help & exit")
+	fmt.Fprintln(stdout, "  [1] Scaffold a new API contract (HTTP / REST, WebSocket, Socket)")
+	fmt.Fprintln(stdout, "  [2] Ingest existing API (from OpenAPI, Swagger URL, Postman, or HAR)")
+	fmt.Fprintln(stdout, "  [3] Initialize empty .vortex.yml configuration")
+	fmt.Fprintln(stdout, "  [4] Print command help & exit")
 	fmt.Fprint(stdout, "\n> ")
 
 	reader := bufio.NewReader(os.Stdin)
@@ -182,7 +182,7 @@ func (c *CmdAutoPilot) runWorld1Onboarding(ctx context.Context, cwd string, stdo
 	if choice == "" || choice == "4" {
 		fmt.Fprintln(
 			stdout,
-			"\n💡 Run `vortex example` to inspect contract templates, or `vortex init` to configure workspace.",
+			"\n↳ Run `vortex example` to inspect contract templates, or `vortex init` to configure workspace.",
 		)
 
 		return nil
@@ -296,7 +296,7 @@ contracts:
 	fmt.Fprintf(stdout, "\n✔ Created %s (Declarative %s template)\n", relAPI, strings.ToUpper(tplKind))
 	fmt.Fprintln(stdout, "✔ Created .vortex.yml (Workspace configuration)")
 	fmt.Fprintf(stdout, "✔ Compiled %s (%d bytes)\n", relGen, len(res.Code))
-	fmt.Fprintln(stdout, "\n✨ Workspace initialized! Run `vortex` anytime to audit, synchronize & rebuild.")
+	fmt.Fprintln(stdout, "\n✔ Workspace initialized! Run `vortex` anytime to audit, synchronize & rebuild.")
 
 	return nil
 }
@@ -311,7 +311,7 @@ func (c *CmdAutoPilot) runWorld2Pipeline(
 ) error {
 	start := time.Now()
 
-	fmt.Fprintf(stdout, "⚡ Vortex Auto-Pilot: Audit & Build Pipeline\n")
+	fmt.Fprintf(stdout, "◆ Vortex Auto-Pilot: Audit & Build Pipeline\n")
 	fmt.Fprintf(stdout, "Workspace: %s (%d contract files)\n\n", rootDir, len(contractFiles))
 
 	// STAGE 1: Pre-flight Contract Audit & Auto-Heal
@@ -332,13 +332,13 @@ func (c *CmdAutoPilot) runWorld2Pipeline(
 	for _, file := range contractFiles {
 		srcBytes, readErr := os.ReadFile(file)
 		if readErr != nil {
-			fmt.Fprintf(stderr, "\n❌ [Pre-flight Check] Failed to read contract file %s: %v\n", file, readErr)
+			fmt.Fprintf(stderr, "\n✖ [Pre-flight Check] Failed to read contract file %s: %v\n", file, readErr)
 			return fmt.Errorf("reading contract %s: %w", file, readErr)
 		}
 
 		astFile, parseErr := goastparser.ParseFile(fset, file, srcBytes, goastparser.ParseComments)
 		if parseErr != nil {
-			fmt.Fprintf(stderr, "\n❌ [Pre-flight Check] Syntax error in contract file %s: %v\n", file, parseErr)
+			fmt.Fprintf(stderr, "\n✖ [Pre-flight Check] Syntax error in contract file %s: %v\n", file, parseErr)
 			return fmt.Errorf("parsing Go AST for %s: %w", file, parseErr)
 		}
 
@@ -360,7 +360,7 @@ func (c *CmdAutoPilot) runWorld2Pipeline(
 		if report.Errors() > 0 {
 			hasCriticalErrors = true
 
-			fmt.Fprintf(stderr, "\n❌ [Pre-flight Linter Blocked Build] Critical error in %s:\n", file)
+			fmt.Fprintf(stderr, "\n✖ [Pre-flight Linter Blocked Build] Critical error in %s:\n", file)
 
 			for _, diag := range report.Diagnostics {
 				if diag.Severity == lint.SeverityError {
@@ -382,9 +382,9 @@ func (c *CmdAutoPilot) runWorld2Pipeline(
 		return errors.New("contract compilation aborted due to critical lint errors (fix errors above to proceed)")
 	}
 
-	auditStatus := tui.BadgePassed() + " (100% clean)"
+	auditStatus := tui.BadgePassed() + " [100% clean]"
 	if autoFixCount > 0 {
-		auditStatus = fmt.Sprintf("%s (%d safe warnings auto-fixed)", tui.BadgePassed(), autoFixCount)
+		auditStatus = fmt.Sprintf("%s [%d safe warnings auto-fixed]", tui.BadgePassed(), autoFixCount)
 	}
 
 	fmt.Fprintln(stdout, tui.RenderStep(1, 3, "Pre-flight Contract Audit", auditStatus, 44))
@@ -418,10 +418,10 @@ func (c *CmdAutoPilot) runWorld2Pipeline(
 	}
 
 	if upstreamSyncCount > 0 {
-		upStatus := fmt.Sprintf("%s (%d spec(s) updated)", tui.Green("✔ Synchronized"), upstreamSyncCount)
+		upStatus := fmt.Sprintf("%s [%d spec(s) updated]", tui.Green("✔ Synchronized"), upstreamSyncCount)
 		fmt.Fprintln(stdout, tui.RenderStep(2, 3, "Upstream Specifications", upStatus, 44))
 	} else {
-		upStatus := tui.Green("✔ Up-to-date (0 drift)")
+		upStatus := tui.Green("✔ Up-to-date") + " [0 drift]"
 		fmt.Fprintln(stdout, tui.RenderStep(2, 3, "Upstream Specifications", upStatus, 44))
 	}
 
@@ -504,9 +504,9 @@ func (c *CmdAutoPilot) runWorld2Pipeline(
 
 	totalMethods = statusRep.TotalMethods
 
-	genStatus := fmt.Sprintf("%s %s emitted (%d services, %d methods)",
+	genStatus := fmt.Sprintf("%s %s emitted [%d services | %d methods]",
 		tui.Green("✔"),
-		formatByteSize(totalBytes),
+		tui.FormatBytes(uint64(totalBytes)),
 		totalServices,
 		totalMethods,
 	)
@@ -517,8 +517,8 @@ func (c *CmdAutoPilot) runWorld2Pipeline(
 	// STAGE 4: Final Consolidated Dashboard
 	doc := text.NewDocument().
 		Divider().
-		Section("📊", "Autopilot Summary").
-		Field("Go Clients", fmt.Sprintf("%d services, %d methods compiled (100%% Zero-Alloc)", totalServices, totalMethods)).
+		Section("◆", "Autopilot Summary").
+		Field("Go Clients", fmt.Sprintf("%d services, %d methods compiled [100%% zero-alloc]", totalServices, totalMethods)).
 		Field("Linter Score", "100% Clean (All invariants respected)")
 
 	if len(statusRep.Proposals) > 0 {
@@ -530,21 +530,12 @@ func (c *CmdAutoPilot) runWorld2Pipeline(
 
 	doc.Success(
 		"Workspace Synchronized",
-		fmt.Sprintf("Workspace is 100%% healthy, synchronized, and compiled in %v!", elapsed.Round(time.Millisecond)),
+		fmt.Sprintf(
+			"Workspace is 100%% healthy, synchronized, and compiled [%v | 0 allocs]!",
+			elapsed.Round(time.Millisecond),
+		),
 	)
 	defer doc.Release()
 
 	return doc.RenderTo(stdout, text.DefaultTerminalRenderer)
-}
-
-func formatByteSize(b int) string {
-	if b < 1024 {
-		return fmt.Sprintf("%d B", b)
-	}
-
-	if b < 1024*1024 {
-		return fmt.Sprintf("%.1f KB", float64(b)/1024.0)
-	}
-
-	return fmt.Sprintf("%.2f MB", float64(b)/(1024.0*1024.0))
 }

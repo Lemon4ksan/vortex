@@ -159,7 +159,7 @@ func (c *CmdClean) Run(_ context.Context, args []string, stdout, stderr io.Write
 	})
 
 	if len(toDelete) == 0 {
-		fmt.Fprintf(stdout, "✨ Workspace is completely clean! No artifacts found to remove in %s\n", targetDir)
+		fmt.Fprintf(stdout, "✔ Workspace is completely clean! No artifacts found to remove in %s\n", targetDir)
 		return nil
 	}
 
@@ -169,7 +169,7 @@ func (c *CmdClean) Run(_ context.Context, args []string, stdout, stderr io.Write
 	}
 
 	if dryRun {
-		fmt.Fprintf(stdout, "🔍 Dry-run: Found %d artifact(s) to remove in %s (~%s):\n",
+		fmt.Fprintf(stdout, "◆ Dry-run: Found %d artifact(s) to remove in %s (~%s):\n",
 			len(toDelete), targetDir, formatBytes(totalBytes))
 
 		for _, item := range toDelete {

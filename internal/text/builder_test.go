@@ -16,8 +16,8 @@ import (
 
 func TestDocumentBuilder_AllNodes(t *testing.T) {
 	doc := text.NewDocument().
-		Title("🚀", "Release Notes").
-		Section("📦", "Artifacts").
+		Title("◆", "Release Notes").
+		Section("◆", "Artifacts").
 		Field("Version", "v2.5.0").
 		FieldCode("Commit", "a1b2c3d").
 		FieldBold("Status", "STABLE").
@@ -43,8 +43,8 @@ func TestDocumentBuilder_AllNodes(t *testing.T) {
 
 	// 1. Markdown Rendering
 	md := doc.ToMarkdown()
-	require.Contains(t, md, "# 🚀 Release Notes")
-	require.Contains(t, md, "**📦 Artifacts:**")
+	require.Contains(t, md, "# ◆ Release Notes")
+	require.Contains(t, md, "**◆ Artifacts:**")
 	require.Contains(t, md, "• **Version**: v2.5.0")
 	require.Contains(t, md, "• **Commit**: `a1b2c3d`")
 	require.Contains(t, md, "• **Status**: **STABLE**")
@@ -62,8 +62,8 @@ func TestDocumentBuilder_AllNodes(t *testing.T) {
 
 	// 2. Plain Text Rendering
 	plain := doc.ToPlain()
-	require.Contains(t, plain, "🚀 Release Notes")
-	require.Contains(t, plain, "📦 Artifacts:")
+	require.Contains(t, plain, "◆ Release Notes")
+	require.Contains(t, plain, "◆ Artifacts:")
 	require.Contains(t, plain, "Version: v2.5.0")
 	require.Contains(t, plain, "[SUCCESS]")
 	require.Contains(t, plain, "[WARNING]")
@@ -105,7 +105,7 @@ func TestDocumentBuilder_TableAlignment(t *testing.T) {
 
 func TestDocumentBuilder_CustomRenderer(t *testing.T) {
 	doc := text.NewDocument().
-		Title("🔥", "Hot Topic").
+		Title("◆", "Hot Topic").
 		Paragraph("Body text here.")
 
 	var customBuf bytes.Buffer

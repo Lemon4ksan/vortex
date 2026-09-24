@@ -865,10 +865,10 @@ func (r *StackDiffResult) RenderText() string {
 	// 1. AST Evolution Summary
 	if r.ASTEvolution != nil {
 		if len(r.ASTEvolution.TupleRenames) > 0 {
-			fmt.Fprintf(&buf, "📦 Tuple Field Renames (Deobfuscation Dictionary):\n")
+			fmt.Fprintf(&buf, "◆ Tuple Field Renames (Deobfuscation Dictionary):\n")
 
 			for _, tr := range r.ASTEvolution.TupleRenames {
-				fmt.Fprintf(&buf, "  • %s [Tag #%s]: %s ➔ %s (%s)\n",
+				fmt.Fprintf(&buf, "  • %s [Tag #%s]: %s ↳ %s (%s)\n",
 					tr.StructName, tr.Tag, tr.OldField, tr.NewField, tr.GoType)
 			}
 
@@ -876,17 +876,17 @@ func (r *StackDiffResult) RenderText() string {
 		}
 
 		if len(r.ASTEvolution.MethodRenames) > 0 {
-			fmt.Fprintf(&buf, "⚡ RPC / Method Renames:\n")
+			fmt.Fprintf(&buf, "◆ RPC / Method Renames:\n")
 
 			for _, mr := range r.ASTEvolution.MethodRenames {
-				fmt.Fprintf(&buf, "  • %s: %s ➔ %s\n", mr.Route, mr.OldMethod, mr.NewMethod)
+				fmt.Fprintf(&buf, "  • %s: %s ↳ %s\n", mr.Route, mr.OldMethod, mr.NewMethod)
 			}
 
 			fmt.Fprintf(&buf, "\n")
 		}
 
 		if len(r.ASTEvolution.AddedEndpoints) > 0 {
-			fmt.Fprintf(&buf, "➕ Added Endpoints (%d):\n", len(r.ASTEvolution.AddedEndpoints))
+			fmt.Fprintf(&buf, "+ Added Endpoints (%d):\n", len(r.ASTEvolution.AddedEndpoints))
 
 			for _, ep := range r.ASTEvolution.AddedEndpoints {
 				fmt.Fprintf(&buf, "  + %s\n", ep)
@@ -896,7 +896,7 @@ func (r *StackDiffResult) RenderText() string {
 		}
 
 		if len(r.ASTEvolution.RemovedEndpoints) > 0 {
-			fmt.Fprintf(&buf, "➖ Removed Endpoints (%d):\n", len(r.ASTEvolution.RemovedEndpoints))
+			fmt.Fprintf(&buf, "- Removed Endpoints (%d):\n", len(r.ASTEvolution.RemovedEndpoints))
 
 			for _, ep := range r.ASTEvolution.RemovedEndpoints {
 				fmt.Fprintf(&buf, "  - %s\n", ep)
@@ -907,7 +907,7 @@ func (r *StackDiffResult) RenderText() string {
 	}
 
 	// 2. File Level Changes
-	fmt.Fprintf(&buf, "📄 File Modifications:\n")
+	fmt.Fprintf(&buf, "◆ File Modifications:\n")
 
 	for _, fd := range r.FileDiffs {
 		switch fd.Status {

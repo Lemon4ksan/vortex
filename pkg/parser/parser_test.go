@@ -335,3 +335,82 @@ type OrderService interface {
 	require.Equal(t, "*ApiError", m1.Return.StatusMap[402].Name)
 	require.Equal(t, "ApiError", m1.Return.ErrorModelType)
 }
+
+func TestParser_GenericOptionalFields(t *testing.T) {
+	src := `package testapi
+
+import (
+	"context"
+	"time"
+	"github.com/lemon4ksan/foundation/generic"
+)
+
+// @aoni:dto
+type SearchFilter struct {
+	Query   generic.Optional[string]    ` + "`query:\"q\"`" + `
+	Page    generic.Optional[int]       ` + "`query:\"page\"`" + `
+	Active  generic.Optional[bool]      ` + "`query:\"active\"`" + `
+	Created generic.Optional[time.Time] ` + "`query:\"created\"`" + `
+	Pair    generic.Pair[string, int]   ` + "`query:\"pair\"`" + `
+}
+
+// @aoni:service
+type SearchService interface {
+	// @get "/search"
+	Search(ctx context.Context, filter *SearchFilter, optQ generic.Optional[string]) error
+}
+`
+
+	p := parser.NewParser()
+	root, err := p.ParseSource("filter.go", []byte(src))
+	require.NoError(t, err)
+	require.NotNil(t, root)
+	require.Len(t, root.Structs, 1)
+
+	s := root.Structs[0]
+	require.Equal(t, "SearchFilter", s.Name)
+	require.Len(t, s.Fields, 5)
+
+	// Field 0: generic.Optional[string]
+	require.Equal(t, "Query", s.Fields[0].GoName)
+	require.Equal(t, "generic.Optional[string]", s.Fields[0].Type.Name)
+	require.Equal(t, "string", s.Fields[0].Type.ElemType)
+	require.True(t, s.Fields[0].Type.IsCustomType)
+
+	// Field 1: generic.Optional[int]
+	require.Equal(t, "Page", s.Fields[1].GoName)
+	require.Equal(t, "generic.Optional[int]", s.Fields[1].Type.Name)
+	require.Equal(t, "int", s.Fields[1].Type.ElemType)
+	require.True(t, s.Fields[1].Type.IsCustomType)
+
+	// Field 2: generic.Optional[bool]
+	require.Equal(t, "Active", s.Fields[2].GoName)
+	require.Equal(t, "generic.Optional[bool]", s.Fields[2].Type.Name)
+	require.Equal(t, "bool", s.Fields[2].Type.ElemType)
+	require.True(t, s.Fields[2].Type.IsCustomType)
+
+	// Field 3: generic.Optional[time.Time]
+	require.Equal(t, "Created", s.Fields[3].GoName)
+	require.Equal(t, "generic.Optional[time.Time]", s.Fields[3].Type.Name)
+	require.Equal(t, "time.Time", s.Fields[3].Type.ElemType)
+	require.True(t, s.Fields[3].Type.IsCustomType)
+
+	// Field 4: generic.Pair[string, int] (IndexListExpr)
+	require.Equal(t, "Pair", s.Fields[4].GoName)
+	require.Equal(t, "generic.Pair[string, int]", s.Fields[4].Type.Name)
+	require.Equal(t, "string, int", s.Fields[4].Type.ElemType)
+	require.True(t, s.Fields[4].Type.IsCustomType)
+
+	// Verify Service and Method parameter binding
+	require.Len(t, root.Services, 1)
+	m := root.Services[0].Methods[0]
+	require.Equal(t, "Search", m.Name)
+	require.Len(t, m.Params, 3)
+
+	// filter param is a DTO query struct
+	require.Equal(t, ir.LocQueryStruct, m.Params[1].Location)
+
+	// optQ param must NOT be treated as LocQueryStruct! It is an individual query parameter
+	require.NotEqual(t, ir.LocQueryStruct, m.Params[2].Location)
+	require.Equal(t, ir.LocQuery, m.Params[2].Location)
+}

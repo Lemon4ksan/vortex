@@ -23,6 +23,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lemon4ksan/foundation/tuikit"
+
 	"github.com/lemon4ksan/vortex/internal/base"
 	"github.com/lemon4ksan/vortex/internal/text"
 	"github.com/lemon4ksan/vortex/pkg/project"
@@ -230,7 +232,7 @@ func parseBenchmarkOutput(output string) []EndpointPerfRecord {
 
 		status := "✔ PASS"
 		if !zeroAlloc {
-			status = "⚠️ ALLOC"
+			status = "▲ ALLOC"
 		}
 
 		records = append(records, EndpointPerfRecord{
@@ -350,24 +352,24 @@ func formatLatency(ns float64) string {
 
 func renderTerminalReport(w io.Writer, r *ProfileReport) error {
 	doc := text.NewDocument().
-		Title("⚡", "Vortex Silicon & API Performance Profiler").
+		Title("◆", "Vortex Silicon & API Performance Profiler").
 		Field("Workspace", fmt.Sprintf("%s (%d endpoints)", r.Workspace, r.EndpointsCount)).
 		Field("Platform", fmt.Sprintf("%s/%s (%d CPU threads) | Engine: aoni/fast", r.OS, r.Arch, r.CPUCores)).
 		Divider().
-		Section("📊", "EXECUTIVE PERFORMANCE SUMMARY").
+		Section("◆", "EXECUTIVE PERFORMANCE SUMMARY").
 		Field("Zero-Alloc Invariant", fmt.Sprintf("%.1f%% (%d/%d endpoints 0 B/op)", r.ZeroAllocRate, int(r.ZeroAllocRate*float64(r.EndpointsCount)/100.0), r.EndpointsCount)).
 		Field("Peak Feeder Speed", fmt.Sprintf("%s (%s)", formatThroughput(r.PeakThroughputOpsS), r.PeakThroughputName)).
 		Field("Median Client Overhead", formatLatency(r.AvgNsPerOp)+" (pure CPU register compute)").
 		Field("GC Memory Pressure", "0.00 MB / 0 GC cycles under parallel load").
 		Divider().
-		Section("🔬", "ENDPOINT LATENCY & ALLOCATION LEDGER")
+		Section("◆", "ENDPOINT LATENCY & ALLOCATION LEDGER")
 	defer doc.Release()
 
 	headers := []string{"SERVICE", "METHOD", "THROUGHPUT", "LATENCY", "ALLOCS", "STATUS"}
 	rows := make([][]string, 0, len(r.Records))
 
 	for _, rec := range r.Records {
-		allocStr := fmt.Sprintf("%d B/op (%d)", rec.BytesPerOp, rec.AllocsPerOp)
+		allocStr := fmt.Sprintf("%s/op (%d)", tuikit.FormatBytes(uint64(rec.BytesPerOp)), rec.AllocsPerOp)
 		if rec.ZeroAlloc {
 			allocStr = "0 B/op"
 		}
@@ -385,15 +387,36 @@ func renderTerminalReport(w io.Writer, r *ProfileReport) error {
 	doc.Table(headers, rows...)
 	doc.Divider()
 
-	doc.Section("⏱️", "LATENCY TAX DECOMPOSITION (Where does time go per network roundtrip?)")
+	doc.Section("◆", "LATENCY TAX DECOMPOSITION (Where does time go per network roundtrip?)")
 
-	taxHeaders := []string{"STAGE", "DURATION", "SHARE", "BREAKDOWN"}
-	doc.Table(taxHeaders,
-		[]string{"Client Encode", formatLatency(r.LatencyEncodeNs), "< 0.001%", "▏"},
-		[]string{"Wire Transit", "12.40 ms", "27.500%", "████████▎"},
-		[]string{"Remote Server", "32.60 ms", "72.499%", "█████████████████████▋"},
-		[]string{"Client Decode", formatLatency(r.LatencyDecodeNs), "< 0.001%", "▏"},
-	)
+	stages := []tuikit.TaxStage{
+		{
+			Name:     "Client Encode",
+			Duration: formatLatency(r.LatencyEncodeNs),
+			Share:    "< 0.001%",
+			Ratio:    0.001,
+		},
+		{
+			Name:     "Wire Transit",
+			Duration: "12.40 ms",
+			Share:    "27.500%",
+			Ratio:    0.275,
+		},
+		{
+			Name:     "Remote Server",
+			Duration: "32.60 ms",
+			Share:    "72.499%",
+			Ratio:    0.725,
+		},
+		{
+			Name:     "Client Decode",
+			Duration: formatLatency(r.LatencyDecodeNs),
+			Share:    "< 0.001%",
+			Ratio:    0.001,
+		},
+	}
+
+	doc.Raw(tuikit.RenderTaxDecomposition(stages, 25))
 	doc.Divider()
 
 	if r.ZeroAllocRate >= 99.0 {

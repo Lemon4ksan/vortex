@@ -271,7 +271,7 @@ func resolveImportTargets(opts *importOptions, stdout io.Writer) {
 
 			if latestFile != "" {
 				opts.inputSpec = latestFile
-				fmt.Fprintf(stdout, "💡 Auto-detected upstream spec: %s\n", latestFile)
+				fmt.Fprintf(stdout, "↳ Auto-detected upstream spec: %s\n", latestFile)
 			}
 		}
 	}

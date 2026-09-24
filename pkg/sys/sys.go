@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package sys encapsulates low-level operating system interactions, CPU hardware inspection,
-// and platform-specific kernel mechanisms (CPU affinity pinning, zero-copy capabilities, SIMD feature flags).
 package sys
 
 import (

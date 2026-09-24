@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package openapi provides parsing, loading, 3-way specification merging,
-// and declarative Go contract generation for OpenAPI 2.0/3.0/3.1 and HAR specifications.
 package openapi
 
 import "fmt"

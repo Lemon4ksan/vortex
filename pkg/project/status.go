@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/lemon4ksan/foundation/pathkit"
+	"github.com/lemon4ksan/foundation/tuikit"
 
 	"github.com/lemon4ksan/vortex/pkg/diff"
 	"github.com/lemon4ksan/vortex/pkg/git"
@@ -89,146 +89,92 @@ func (r *StatusReport) HasIssues() bool {
 
 // Render formats a colored, human-readable terminal dashboard.
 func (r *StatusReport) Render(color bool) string {
-	if color && (os.Getenv("NO_COLOR") != "" || os.Getenv("TERM") == "dumb") {
-		color = false
-	}
+	useColor := color && tuikit.ColorEnabled() && os.Getenv("NO_COLOR") == "" && os.Getenv("TERM") != "dumb"
 
 	var sb strings.Builder
-	sb.WriteString(ansiBold(color, ansiCyan(color, "⚡ Vortex API Guardian")) + "\n")
-	fmt.Fprintf(&sb, "Workspace: %s %s\n\n",
-		r.WorkspaceRoot,
-		ansiDim(color, fmt.Sprintf("(%d services, %d methods)", len(r.Contracts), r.TotalMethods)),
-	)
+	title := "◆ Vortex API Guardian"
+	if useColor {
+		title = tuikit.Bold(tuikit.Cyan(title))
+	} else {
+		title = tuikit.RenderHeader(title)
+	}
+	sb.WriteString(title + "\n")
+
+	meta := fmt.Sprintf("(%d services, %d methods)", len(r.Contracts), r.TotalMethods)
+	if useColor {
+		meta = tuikit.Dim(meta)
+	}
+	fmt.Fprintf(&sb, "Workspace: %s %s\n\n", r.WorkspaceRoot, meta)
 
 	if len(r.Contracts) == 0 {
 		sb.WriteString("No service contracts detected. Run `vortex init` to configure workspace.\n")
 		return sb.String()
 	}
 
-	sb.WriteString(ansiBold(color, "● Contracts & Generated Code:") + "\n")
+	contractsHeader := "● Contracts & Generated Code:"
+	if useColor {
+		contractsHeader = tuikit.Bold(contractsHeader)
+	}
+	sb.WriteString(contractsHeader + "\n")
 
-	maxNameWidth := 0
-	maxPathWidth := 0
-	maxMethodsDigits := 1
-	maxDTOsDigits := 1
 	hasAnyDTOs := false
 	hasAnyVersion := false
-	maxVerWidth := 0
-
 	for _, c := range r.Contracts {
-		if len(c.Name) > maxNameWidth {
-			maxNameWidth = len(c.Name)
-		}
-
-		pathStr := "(" + filepath.ToSlash(filepath.Dir(c.File)) + ")"
-		if len(pathStr) > maxPathWidth {
-			maxPathWidth = len(pathStr)
-		}
-
-		mDigits := len(strconv.Itoa(c.MethodsCount))
-		if mDigits > maxMethodsDigits {
-			maxMethodsDigits = mDigits
-		}
-
 		if c.DTOsCount > 0 {
 			hasAnyDTOs = true
-
-			dDigits := len(strconv.Itoa(c.DTOsCount))
-			if dDigits > maxDTOsDigits {
-				maxDTOsDigits = dDigits
-			}
 		}
-
 		if c.Version != "" {
 			hasAnyVersion = true
-
-			verLen := len(fmt.Sprintf("[%s]", c.Version))
-			if verLen > maxVerWidth {
-				maxVerWidth = verLen
-			}
 		}
 	}
 
+	tblContracts := tuikit.NewTable().SetIndent(2)
+
 	for _, c := range r.Contracts {
-		statusIcon := "✔"
-		statusDesc := "100% in sync"
-
+		var iconStyled, descStyled string
 		if c.IsGenStale {
-			statusIcon = "⚠"
-			statusDesc = c.GenStaleReason
-		}
-
-		iconStyled := statusIcon
-		if color {
-			if c.IsGenStale {
-				iconStyled = ansiYellow(color, statusIcon)
+			if useColor {
+				iconStyled = tuikit.Badge("▲", tuikit.Yellow)
+				descStyled = tuikit.Yellow(c.GenStaleReason)
 			} else {
-				iconStyled = ansiGreen(color, statusIcon)
-			}
-		}
-
-		namePadded := fmt.Sprintf("%-*s", maxNameWidth, c.Name)
-
-		pathStr := "(" + filepath.ToSlash(filepath.Dir(c.File)) + ")"
-
-		pathPadded := fmt.Sprintf("%-*s", maxPathWidth, pathStr)
-		if color {
-			pathPadded = ansiDim(color, pathPadded)
-		}
-
-		methodsPart := fmt.Sprintf("%*d methods", maxMethodsDigits, c.MethodsCount)
-
-		var metricsPart string
-		if hasAnyDTOs {
-			if c.DTOsCount > 0 {
-				metricsPart = fmt.Sprintf("%s, %*d DTOs", methodsPart, maxDTOsDigits, c.DTOsCount)
-			} else {
-				metricsPart = methodsPart + strings.Repeat(" ", 2+maxDTOsDigits+5)
+				iconStyled = "▲"
+				descStyled = c.GenStaleReason
 			}
 		} else {
-			metricsPart = methodsPart
+			if useColor {
+				iconStyled = tuikit.Badge("✔", tuikit.Green)
+				descStyled = tuikit.Green("100% in sync")
+			} else {
+				iconStyled = "✔"
+				descStyled = "100% in sync"
+			}
 		}
 
-		descStyled := statusDesc
-		if color {
-			if c.IsGenStale {
-				descStyled = ansiYellow(color, statusDesc)
-			} else {
-				descStyled = ansiGreen(color, statusDesc)
-			}
+		pathStr := "(" + filepath.ToSlash(filepath.Dir(c.File)) + ")"
+		if useColor {
+			pathStr = tuikit.Dim(pathStr)
+		}
+
+		methodsPart := fmt.Sprintf("%d methods", c.MethodsCount)
+		if hasAnyDTOs && c.DTOsCount > 0 {
+			methodsPart = fmt.Sprintf("%d methods, %d DTOs", c.MethodsCount, c.DTOsCount)
 		}
 
 		if hasAnyVersion {
 			verStr := ""
 			if c.Version != "" {
 				verStr = fmt.Sprintf("[%s]", c.Version)
+				if useColor {
+					verStr = tuikit.Cyan(verStr)
+				}
 			}
-
-			verPadded := fmt.Sprintf("%-*s", maxVerWidth, verStr)
-			if color && verStr != "" {
-				verPadded = ansiCyan(color, verStr) + strings.Repeat(" ", maxVerWidth-len(verStr))
-			}
-
-			fmt.Fprintf(&sb, "  %s %s  %s  %s  %s  %s\n",
-				iconStyled,
-				namePadded,
-				pathPadded,
-				metricsPart,
-				verPadded,
-				descStyled,
-			)
+			tblContracts.AddRow(iconStyled, c.Name, pathStr, methodsPart, verStr, descStyled)
 		} else {
-			fmt.Fprintf(&sb, "  %s %s  %s  %s  %s\n",
-				iconStyled,
-				namePadded,
-				pathPadded,
-				metricsPart,
-				descStyled,
-			)
+			tblContracts.AddRow(iconStyled, c.Name, pathStr, methodsPart, descStyled)
 		}
 	}
 
-	sb.WriteString("\n")
+	sb.WriteString(tblContracts.String() + "\n")
 
 	// Upstream Drift section
 	hasUpstream := false
@@ -240,59 +186,55 @@ func (r *StatusReport) Render(color bool) string {
 	}
 
 	if hasUpstream {
-		sb.WriteString(ansiBold(color, "● Upstream Drift (OpenAPI / External):") + "\n")
-
-		maxUpstreamNameWidth := 0
-		for _, c := range r.Contracts {
-			if c.Source != "" && len(c.Name) > maxUpstreamNameWidth {
-				maxUpstreamNameWidth = len(c.Name)
-			}
+		hdr := "● Upstream Drift (OpenAPI / External):"
+		if useColor {
+			hdr = tuikit.Bold(hdr)
 		}
+		sb.WriteString(hdr + "\n")
+
+		tblDrift := tuikit.NewTable().SetIndent(2)
 
 		for _, c := range r.Contracts {
 			if c.Source == "" {
 				continue
 			}
 
-			namePadded := fmt.Sprintf("%-*s", maxUpstreamNameWidth, c.Name)
-
+			var badge, desc string
 			switch {
 			case c.UpstreamBreakingCount > 0:
-				desc := fmt.Sprintf("%d BREAKING drift(s) detected with %s", c.UpstreamBreakingCount, c.Source)
-				if color {
-					desc = ansiRed(color, desc)
+				text := fmt.Sprintf("%d BREAKING drift(s) detected with %s", c.UpstreamBreakingCount, c.Source)
+				if useColor {
+					badge = tuikit.Badge("✖ BREAKING", tuikit.Red)
+					desc = tuikit.Red(text)
+				} else {
+					badge = "✖ BREAKING"
+					desc = text
 				}
-
-				fmt.Fprintf(&sb, "  🔴 %s  %s\n", namePadded, desc)
-
 			case c.UpstreamDriftCount > 0 || c.UpstreamGhostCount > 0:
-				desc := fmt.Sprintf(
-					"%d non-breaking update(s) available in %s",
-					c.UpstreamDriftCount+c.UpstreamGhostCount,
-					c.Source,
-				)
-				if color {
-					desc = ansiYellow(color, desc)
+				cnt := c.UpstreamDriftCount + c.UpstreamGhostCount
+				text := fmt.Sprintf("%d non-breaking update(s) available in %s", cnt, c.Source)
+				if useColor {
+					badge = tuikit.Badge("▲ DRIFT", tuikit.Yellow)
+					desc = tuikit.Yellow(text)
+				} else {
+					badge = "▲ DRIFT"
+					desc = text
 				}
-
-				fmt.Fprintf(&sb, "  🟡 %s  %s\n", namePadded, desc)
-
 			default:
-				icon := "✔"
-				if color {
-					icon = ansiGreen(color, "✔")
+				text := fmt.Sprintf("Up-to-date with %s (0 drift)", c.Source)
+				if useColor {
+					badge = tuikit.Badge("✔ IN SYNC", tuikit.Green)
+					desc = tuikit.Green(text)
+				} else {
+					badge = "✔ IN SYNC"
+					desc = text
 				}
-
-				desc := fmt.Sprintf("Up-to-date with %s (0 drift)", c.Source)
-				if color {
-					desc = ansiGreen(color, desc)
-				}
-
-				fmt.Fprintf(&sb, "  %s  %s  %s\n", icon, namePadded, desc)
 			}
+
+			tblDrift.AddRow(badge, c.Name, desc)
 		}
 
-		sb.WriteString("\n")
+		sb.WriteString(tblDrift.String() + "\n")
 	}
 
 	// Polyglot plugins
@@ -305,144 +247,123 @@ func (r *StatusReport) Render(color bool) string {
 	}
 
 	if hasPlugins {
-		sb.WriteString(ansiBold(color, "● Polyglot Targets:") + "\n")
+		hdr := "● Polyglot Targets:"
+		if useColor {
+			hdr = tuikit.Bold(hdr)
+		}
+		sb.WriteString(hdr + "\n")
 
-		maxTargetName := 0
+		tblPoly := tuikit.NewTable().SetIndent(2)
 
-		maxTargetOut := 0
 		for _, c := range r.Contracts {
 			for _, p := range c.Plugins {
 				targetName := strings.ToUpper(p.Name) + " SDK"
-				if len(targetName) > maxTargetName {
-					maxTargetName = len(targetName)
-				}
-
 				outStr := "(" + p.Out + ")"
-				if len(outStr) > maxTargetOut {
-					maxTargetOut = len(outStr)
+				if useColor {
+					outStr = tuikit.Dim(outStr)
 				}
-			}
-		}
 
-		for _, c := range r.Contracts {
-			for _, p := range c.Plugins {
-				icon := "✔"
-
-				status := "Up to date"
+				var badge, statusStyled string
 				if p.IsStale {
-					icon = "⚠"
-					status = "Stale (rebuild required)"
-				}
-
-				iconStyled := icon
-
-				statusStyled := status
-				if color {
-					if p.IsStale {
-						iconStyled = ansiYellow(color, "⚠")
-						statusStyled = ansiYellow(color, status)
+					if useColor {
+						badge = tuikit.Badge("▲ STALE", tuikit.Yellow)
+						statusStyled = tuikit.Yellow("Stale (rebuild required)")
 					} else {
-						iconStyled = ansiGreen(color, "✔")
-						statusStyled = ansiGreen(color, status)
+						badge = "▲ STALE"
+						statusStyled = "Stale (rebuild required)"
+					}
+				} else {
+					if useColor {
+						badge = tuikit.Badge("✔ IN SYNC", tuikit.Green)
+						statusStyled = tuikit.Green("Up to date")
+					} else {
+						badge = "✔ IN SYNC"
+						statusStyled = "Up to date"
 					}
 				}
 
-				targetName := strings.ToUpper(p.Name) + " SDK"
-				targetPadded := fmt.Sprintf("%-*s", maxTargetName, targetName)
-
-				outStr := "(" + p.Out + ")"
-
-				outPadded := fmt.Sprintf("%-*s", maxTargetOut, outStr)
-				if color {
-					outPadded = ansiDim(color, outPadded)
-				}
-
-				fmt.Fprintf(&sb, "  %s %s  %s  %s\n", iconStyled, targetPadded, outPadded, statusStyled)
+				tblPoly.AddRow(badge, targetName, outStr, statusStyled)
 			}
 		}
 
-		sb.WriteString("\n")
+		sb.WriteString(tblPoly.String() + "\n")
 	}
 
 	if len(r.Proposals) > 0 {
-		sb.WriteString(ansiBold(color, "● Incoming Consumer Proposals (Git Branches):") + "\n")
-
-		maxPropName := 0
-
-		maxAuthor := 0
-		for _, prop := range r.Proposals {
-			if len(prop.Name) > maxPropName {
-				maxPropName = len(prop.Name)
-			}
-
-			author := "@" + prop.Author
-			if len(author) > maxAuthor {
-				maxAuthor = len(author)
-			}
+		hdr := "● Incoming Consumer Proposals (Git Branches):"
+		if useColor {
+			hdr = tuikit.Bold(hdr)
 		}
+		sb.WriteString(hdr + "\n")
+
+		tblProp := tuikit.NewTable().SetIndent(2)
 
 		for _, prop := range r.Proposals {
+			arrow := "↳"
+			if useColor {
+				arrow = tuikit.Cyan("↳")
+			}
+
 			remoteTag := ""
 			if prop.IsRemote {
 				remoteTag = " [remote]"
-				if color {
-					remoteTag = ansiCyan(color, " [remote]")
+				if useColor {
+					remoteTag = tuikit.Cyan(remoteTag)
 				}
 			}
 
-			propPadded := fmt.Sprintf("%-*s", maxPropName, prop.Name)
 			author := "@" + prop.Author
-			authorPadded := fmt.Sprintf("%-*s", maxAuthor, author)
+			authorWithBy := "by " + author
 
 			dateStr := fmt.Sprintf("(%s)", prop.Date)
-			if color {
-				dateStr = ansiDim(color, dateStr)
+			if useColor {
+				dateStr = tuikit.Dim(dateStr)
 			}
 
-			fmt.Fprintf(&sb, "  🔵 %s  by %s  %s%s\n", propPadded, authorPadded, dateStr, remoteTag)
+			propDesc := prop.Name + remoteTag
+			tblProp.AddRow(arrow, propDesc, authorWithBy, dateStr)
 		}
 
-		sb.WriteString("\n")
+		sb.WriteString(tblProp.String() + "\n")
 	}
 
 	if len(r.NextActions) > 0 {
-		sb.WriteString(ansiDim(color, "───────────────────────────────────────────────────────────────────") + "\n")
-		sb.WriteString(ansiBold(color, ansiYellow(color, "Next Actions:")) + "\n")
+		divider := tuikit.RenderDivider(67)
+		if !useColor {
+			divider = tuikit.StripANSI(divider)
+		}
+		sb.WriteString(divider + "\n")
+
+		hdr := "Next Actions:"
+		if useColor {
+			hdr = tuikit.Bold(tuikit.Yellow(hdr))
+		}
+		sb.WriteString(hdr + "\n")
 
 		for _, action := range r.NextActions {
 			arrow := "↳"
-			if color {
-				arrow = ansiCyan(color, "↳")
+			if useColor {
+				arrow = tuikit.Cyan("↳")
 			}
 
 			fmt.Fprintf(&sb, "  %s %s\n", arrow, action)
 		}
 	} else {
-		msg := "✨ All systems nominal. Network layer is 100% synchronized.\n"
-		if color {
-			msg = ansiBold(color, ansiGreen(color, "✨ All systems nominal. Network layer is 100% synchronized.\n"))
+		msg := "✔ All systems nominal. Network layer is 100% synchronized.\n"
+		if useColor {
+			msg = tuikit.Bold(tuikit.Green(msg))
 		}
 
 		sb.WriteString(msg)
 	}
 
-	return sb.String()
-}
-
-func ansi(color bool, code, text string) string {
-	if !color || text == "" {
-		return text
+	result := sb.String()
+	if !useColor {
+		result = tuikit.StripANSI(result)
 	}
 
-	return code + text + "\033[0m"
+	return result
 }
-
-func ansiBold(color bool, text string) string   { return ansi(color, "\033[1m", text) }
-func ansiDim(color bool, text string) string    { return ansi(color, "\033[2m", text) }
-func ansiGreen(color bool, text string) string  { return ansi(color, "\033[32m", text) }
-func ansiYellow(color bool, text string) string { return ansi(color, "\033[33m", text) }
-func ansiRed(color bool, text string) string    { return ansi(color, "\033[31m", text) }
-func ansiCyan(color bool, text string) string   { return ansi(color, "\033[36m", text) }
 
 // RenderJSON serializes the status report into JSON bytes.
 func (r *StatusReport) RenderJSON() ([]byte, error) {

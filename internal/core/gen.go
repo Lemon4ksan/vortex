@@ -179,7 +179,7 @@ func (c *CmdGen) Run(ctx context.Context, args []string, stdout, stderr io.Write
 	if generatedCount == 0 && !watch {
 		fmt.Fprintf(
 			stdout,
-			"⚡ Scanned %d Go file(s) (0 contracts with @aoni:service found)\n",
+			"◆ Scanned %d Go file(s) (0 contracts with @aoni:service found)\n",
 			len(files),
 		)
 	}

@@ -203,7 +203,7 @@ func (c *CmdConfig) runList(stdout io.Writer, cfg *project.Config, jsonOut bool)
 		return nil
 	}
 
-	fmt.Fprintf(stdout, "⚡ Vortex Workspace Configuration (%s)\n\n", cfg.ConfigPath)
+	fmt.Fprintf(stdout, "◆ Vortex Workspace Configuration (%s)\n\n", cfg.ConfigPath)
 
 	fmt.Fprintf(stdout, "● Defaults:\n")
 	fmt.Fprintf(stdout, "  • Casing:  %s\n", defaultStr(cfg.Defaults.Casing, "snake_case"))
@@ -879,7 +879,7 @@ func removeSecretRule(stdout io.Writer, cfg *project.Config, targetType, key str
 }
 
 func printSecretsConfig(stdout io.Writer, cfg *project.Config) error {
-	fmt.Fprintf(stdout, "⚡ Vortex Secret & Credential Rules (.vortex.yml)\n\n")
+	fmt.Fprintf(stdout, "◆ Vortex Secret & Credential Rules (.vortex.yml)\n\n")
 
 	hasRules := false
 

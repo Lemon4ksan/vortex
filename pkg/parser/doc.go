@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package parser extracts Go interface declarations, structs, and doc comment directives into an Unchecked IR.
-//
-// The parser inspects Go source files using standard go/parser and go/ast tools, identifying
-// compiler directives prefixed with `@` in Godoc comments.
+// Package parser parses Go contract interface declarations and Godoc compiler
+// directives into an unverified intermediate representation (*ir.RootIR).
 package parser

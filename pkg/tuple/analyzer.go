@@ -205,7 +205,7 @@ func resolveDominantType(counts map[string]int) string {
 func (r *TupleAnalysisReport) RenderTable() string {
 	var sb strings.Builder
 
-	fmt.Fprintf(&sb, "⚡ Vortex Tuple Saliency Analysis (%s across %d sample entries)\n\n",
+	fmt.Fprintf(&sb, "◆ Vortex Tuple Saliency Analysis (%s across %d sample entries)\n\n",
 		r.StructName, r.TotalSamples)
 
 	fmt.Fprintf(&sb, "  %-6s %-12s %-12s %-24s %s\n",

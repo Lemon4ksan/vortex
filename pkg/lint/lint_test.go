@@ -231,7 +231,7 @@ func TestEngine_FormatReport(t *testing.T) {
 
 	require.Contains(t, output, "Vortex Contract Inspector")
 	require.Contains(t, output, "param-lifting")
-	require.Contains(t, output, "* W001 (param-lifting): 1")
+	require.Contains(t, output, "W001 (param-lifting)")
 }
 
 func TestRules_StaleCodegen_AppliesFix(t *testing.T) {

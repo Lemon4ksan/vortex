@@ -5,8 +5,8 @@ go 1.27.0
 require (
 	github.com/lemon4ksan/aoni v0.7.0-rc.1.0.20260920194150-eaab0fb5365d
 	github.com/lemon4ksan/aoni-browser v0.0.0-20260920194424-d6ec449ea3f9
-	github.com/lemon4ksan/foundation v0.0.0-20260920191713-7709c688b2d7
-	github.com/lemon4ksan/mach v0.0.0-20260920191812-bb7ae0771871
+	github.com/lemon4ksan/foundation v0.0.0-20260923050528-dc5d9a8c9c6b
+	github.com/lemon4ksan/mach v0.0.0-20260923050623-74d65af4cf4a
 	golang.org/x/sys v0.48.0
 	golang.org/x/tools v0.49.0
 	gopkg.in/yaml.v3 v3.0.1

@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package emitter generates high-performance, zero-allocation Go client facades from Vortex AST RootIR contracts.
 package emitter
 
 import (

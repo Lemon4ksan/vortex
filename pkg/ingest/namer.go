@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package ingest implements generic specification detection and intelligent naming normalizers.
 package ingest
 
 import (

@@ -226,7 +226,7 @@ func (c *CmdSource) findContractIndex(cfg *project.Config, target string) int {
 }
 
 func (c *CmdSource) runList(stdout io.Writer, cfg *project.Config, target string) error {
-	fmt.Fprintf(stdout, "⚡ Vortex Upstream Sources (%s)\n\n", cfg.RootDir)
+	fmt.Fprintf(stdout, "◆ Vortex Upstream Sources (%s)\n\n", cfg.RootDir)
 
 	contracts := cfg.Contracts
 	if target != "" {
@@ -382,7 +382,7 @@ func (c *CmdSource) runFetch(ctx context.Context, stdout io.Writer, cfg *project
 				fmt.Fprintf(stdout, "✔ Verified local schema %s (%s, %.1f KB)\n",
 					ct.Name, src, float64(fi.Size())/1024)
 			} else {
-				fmt.Fprintf(stdout, "❌ Local schema file not found for %s: %s\n", ct.Name, localPath)
+				fmt.Fprintf(stdout, "✖ Local schema file not found for %s: %s\n", ct.Name, localPath)
 			}
 
 			continue
@@ -391,7 +391,7 @@ func (c *CmdSource) runFetch(ctx context.Context, stdout io.Writer, cfg *project
 		// Remote URL
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, src, nil)
 		if err != nil {
-			fmt.Fprintf(stdout, "❌ Invalid URL for %s (%s): %v\n", ct.Name, src, err)
+			fmt.Fprintf(stdout, "✖ Invalid URL for %s (%s): %v\n", ct.Name, src, err)
 			continue
 		}
 
@@ -399,7 +399,7 @@ func (c *CmdSource) runFetch(ctx context.Context, stdout io.Writer, cfg *project
 
 		resp, err := client.Do(req)
 		if err != nil {
-			fmt.Fprintf(stdout, "❌ Failed fetching %s from %s: %v\n", ct.Name, src, err)
+			fmt.Fprintf(stdout, "✖ Failed fetching %s from %s: %v\n", ct.Name, src, err)
 			continue
 		}
 
@@ -407,12 +407,12 @@ func (c *CmdSource) runFetch(ctx context.Context, stdout io.Writer, cfg *project
 		_ = resp.Body.Close()
 
 		if err != nil {
-			fmt.Fprintf(stdout, "❌ Failed reading body for %s: %v\n", ct.Name, err)
+			fmt.Fprintf(stdout, "✖ Failed reading body for %s: %v\n", ct.Name, err)
 			continue
 		}
 
 		if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-			fmt.Fprintf(stdout, "❌ HTTP %d from %s\n", resp.StatusCode, src)
+			fmt.Fprintf(stdout, "✖ HTTP %d from %s\n", resp.StatusCode, src)
 			continue
 		}
 
@@ -483,7 +483,7 @@ func (c *CmdSource) runPing(ctx context.Context, stdout io.Writer, cfg *project.
 					float64(fi.Size())/1024,
 				)
 			} else {
-				fmt.Fprintf(stdout, "❌ %-14s [LOCAL]    File not found: %s\n", ct.Name, localPath)
+				fmt.Fprintf(stdout, "✖ %-14s [LOCAL]    File not found: %s\n", ct.Name, localPath)
 			}
 
 			continue
@@ -497,7 +497,7 @@ func (c *CmdSource) runPing(ctx context.Context, stdout io.Writer, cfg *project.
 		elapsed := time.Since(start)
 
 		if err != nil {
-			fmt.Fprintf(stdout, "❌ %-14s [UNREACH]  %s (%v)\n", ct.Name, src, err)
+			fmt.Fprintf(stdout, "✖ %-14s [UNREACH]  %s (%v)\n", ct.Name, src, err)
 			continue
 		}
 
@@ -513,7 +513,7 @@ func (c *CmdSource) runPing(ctx context.Context, stdout io.Writer, cfg *project.
 				elapsed.Round(time.Millisecond),
 			)
 		} else {
-			fmt.Fprintf(stdout, "🟡 %-14s [HTTP %d]  %s\n", ct.Name, resp.StatusCode, truncateString(src, 50))
+			fmt.Fprintf(stdout, "▲ %-14s [HTTP %d]  %s\n", ct.Name, resp.StatusCode, truncateString(src, 50))
 		}
 	}
 
@@ -553,7 +553,7 @@ func (c *CmdSource) runDiff(ctx context.Context, stdout io.Writer, cfg *project.
 
 		root, err := p.ParseFile(goPath)
 		if err != nil {
-			fmt.Fprintf(stdout, "❌ Parsing Go contract %s: %v\n", ct.File, err)
+			fmt.Fprintf(stdout, "✖ Parsing Go contract %s: %v\n", ct.File, err)
 			continue
 		}
 
@@ -566,7 +566,7 @@ func (c *CmdSource) runDiff(ctx context.Context, stdout io.Writer, cfg *project.
 
 		rawBytes, readErr := readSourceBytes(ctx, srcPath)
 		if readErr != nil {
-			fmt.Fprintf(stdout, "❌ Reading spec for %s (%s): %v\n", ct.Name, ct.Upstream.Source, readErr)
+			fmt.Fprintf(stdout, "✖ Reading spec for %s (%s): %v\n", ct.Name, ct.Upstream.Source, readErr)
 			continue
 		}
 
@@ -574,7 +574,7 @@ func (c *CmdSource) runDiff(ctx context.Context, stdout io.Writer, cfg *project.
 		if format == ingest.FormatOpenAPI3 || format == ingest.FormatSwagger2 {
 			doc, docErr := openapi.LoadSpec(srcPath, rawBytes)
 			if docErr != nil {
-				fmt.Fprintf(stdout, "❌ Parsing schema for %s: %v\n", ct.Name, docErr)
+				fmt.Fprintf(stdout, "✖ Parsing schema for %s: %v\n", ct.Name, docErr)
 				continue
 			}
 

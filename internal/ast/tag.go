@@ -266,7 +266,7 @@ func (c *CmdTag) runList(
 		return nil
 	}
 
-	fmt.Fprintf(stdout, "⚡ Vortex API Contract Releases (%s)\n\n", rootDir)
+	fmt.Fprintf(stdout, "◆ Vortex API Contract Releases (%s)\n\n", rootDir)
 
 	if len(tags) == 0 {
 		fmt.Fprintf(stdout, "No API release tags found. Create one with `vortex ast tag add v1.0.0 -m \"Message\"`.\n")
@@ -556,7 +556,7 @@ func (c *CmdTag) runShow(
 		return nil
 	}
 
-	fmt.Fprintf(stdout, "⚡ API Release Snapshot: %s\n\n", found.Version)
+	fmt.Fprintf(stdout, "◆ API Release Snapshot: %s\n\n", found.Version)
 	fmt.Fprintf(stdout, "  • Contract:   %s\n", found.Contract)
 
 	if found.File != "" {

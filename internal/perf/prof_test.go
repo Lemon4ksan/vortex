@@ -38,7 +38,7 @@ PASS
 	assert.Equal(t, int64(16), records[3].BytesPerOp)
 	assert.Equal(t, int64(1), records[3].AllocsPerOp)
 	assert.False(t, records[3].ZeroAlloc)
-	assert.Equal(t, "⚠️ ALLOC", records[3].Status)
+	assert.Equal(t, "▲ ALLOC", records[3].Status)
 
 	report := buildProfileReport("test-workspace", records)
 	require.NotNil(t, report)

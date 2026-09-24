@@ -63,7 +63,7 @@ func (c *Cmd) runList(_ context.Context, _ []string, stdout, _ io.Writer) error 
 	}
 
 	doc := text.NewDocument().
-		Title("⚡", "Vortex Traffic Cache (.vortex/cache/traffic)")
+		Title("◆", "Vortex Traffic Cache (.vortex/cache/traffic)")
 	defer doc.Release()
 
 	headers := []string{"ID", "ORIGINAL FILE", "DOMAINS", "ENDPOINTS", "RAW -> GZ", "SANITIZED", "DATE"}
@@ -207,7 +207,7 @@ func (c *Cmd) runShow(ctx context.Context, args []string, stdout, stderr io.Writ
 
 	entries := har.Log.Entries
 	if len(entries) == 0 {
-		fmt.Fprintf(stdout, "⚡ Traffic Session %s: 0 captured requests found\n", sessionID)
+		fmt.Fprintf(stdout, "◆ Traffic Session %s: 0 captured requests found\n", sessionID)
 
 		return nil
 	}
@@ -223,7 +223,7 @@ func (c *Cmd) runShow(ctx context.Context, args []string, stdout, stderr io.Writ
 		}
 
 		e := entries[entryIdx]
-		fmt.Fprintf(stdout, "⚡ Traffic Entry #%d in %s\n", entryIdx, sessionID)
+		fmt.Fprintf(stdout, "◆ Traffic Entry #%d in %s\n", entryIdx, sessionID)
 		fmt.Fprintf(stdout, "  Method:       %s\n", e.Request.Method)
 		fmt.Fprintf(stdout, "  URL:          %s\n", e.Request.URL)
 		fmt.Fprintf(stdout, "  Status:       %d %s\n", e.Response.Status, e.Response.StatusText)
@@ -295,7 +295,7 @@ func (c *Cmd) runShow(ctx context.Context, args []string, stdout, stderr io.Writ
 
 	// Mode 2: Summary table of entries
 	doc := text.NewDocument().
-		Title("⚡", fmt.Sprintf("Traffic Session: %s (%d total entries)", sessionID, len(entries)))
+		Title("◆", fmt.Sprintf("Traffic Session: %s (%d total entries)", sessionID, len(entries)))
 	defer doc.Release()
 
 	headers := []string{"ENTRY", "METHOD", "ENDPOINT / URL", "STATUS", "REQ PREVIEW", "RESP PREVIEW"}
@@ -421,13 +421,13 @@ func (c *Cmd) executeStore(
 
 			data, err := os.ReadFile(fPath)
 			if err != nil {
-				fmt.Fprintf(stderr, "⚠️  Failed reading %s: %v\n", fPath, err)
+				fmt.Fprintf(stderr, "▲ Failed reading %s: %v\n", fPath, err)
 				continue
 			}
 
 			entry, secrets, err := cache.StoreTraffic(rootDir, fPath, data, moveFlag, sanitizeFlag)
 			if err != nil {
-				fmt.Fprintf(stderr, "⚠️  Failed caching %s: %v\n", fPath, err)
+				fmt.Fprintf(stderr, "▲ Failed caching %s: %v\n", fPath, err)
 				continue
 			}
 
@@ -557,7 +557,7 @@ func (c *Cmd) runSecrets(_ context.Context, args []string, stdout, _ io.Writer) 
 		}
 
 		doc := text.NewDocument().
-			Title("🔑", "Vortex Local Credentials Vault (.vortex/cache/secrets.json)")
+			Title("◆", "Vortex Local Credentials Vault (.vortex/cache/secrets.json)")
 		defer doc.Release()
 
 		headers := []string{"KEY", "MASKED VALUE", "ORIGIN", "UPDATED"}
@@ -645,7 +645,7 @@ func (c *Cmd) runDelete(_ context.Context, args []string, stdout, _ io.Writer) e
 		if deleted {
 			fmt.Fprintf(stdout, "✔ Deleted cached traffic session %q\n", id)
 		} else {
-			fmt.Fprintf(stdout, "⚠️ Session %q not found in cache\n", id)
+			fmt.Fprintf(stdout, "▲ Session %q not found in cache\n", id)
 		}
 	}
 
@@ -751,7 +751,7 @@ func (c *Cmd) runWebUI(ctx context.Context, sessionID string, entries []rawHAREn
 
 	dashboardURL := fmt.Sprintf("http://127.0.0.1:%d", port)
 
-	fmt.Fprintf(stdout, "\n⚡ Vortex Web Inspector active for session: %s (%d requests)\n", sessionID, len(entries))
+	fmt.Fprintf(stdout, "\n◆ Vortex Web Inspector active for session: %s (%d requests)\n", sessionID, len(entries))
 	fmt.Fprintf(stdout, "   Dashboard: %s\n", dashboardURL)
 	fmt.Fprintf(stdout, "   Press Ctrl+C to stop.\n\n")
 

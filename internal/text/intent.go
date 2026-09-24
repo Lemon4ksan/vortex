@@ -42,19 +42,19 @@ func (i Intent) String() string {
 	}
 }
 
-// Icon returns the canonical Unicode symbol or emoji corresponding to the intent.
+// Icon returns the canonical understated Unicode glyph corresponding to the intent.
 func (i Intent) Icon() string {
 	switch i {
 	case IntentInfo:
-		return "ℹ️"
+		return "ℹ"
 	case IntentSuccess:
-		return "✅"
+		return "✔"
 	case IntentWarning:
-		return "⚠️"
+		return "▲"
 	case IntentDanger:
-		return "❌"
+		return "✖"
 	case IntentMuted:
-		return "•"
+		return "—"
 	default:
 		return ""
 	}

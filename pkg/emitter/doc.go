@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package emitter produces production-grade, zero-allocation Go source code from the normalized IR.
-//
-// Generated code includes client struct implementations, pre-configured constructors,
-// stack-buffered query/form serializers, response envelope unwrappers, and tuple decoders.
+// Package emitter generates formatted Go source code from an optimized
+// Intermediate Representation (*ir.RootIR), including client facades,
+// zero-allocation DTO serializers, bitpacks, unions, and mocks.
 package emitter

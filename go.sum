@@ -12,10 +12,8 @@ github.com/lemon4ksan/aoni v0.7.0-rc.1.0.20260920194150-eaab0fb5365d h1:zm8kEY1v
 github.com/lemon4ksan/aoni v0.7.0-rc.1.0.20260920194150-eaab0fb5365d/go.mod h1:YRXeBuJrhlLk5Ejvs9IN77i90AmQMfOUddaLieA3Ym4=
 github.com/lemon4ksan/aoni-browser v0.0.0-20260920194424-d6ec449ea3f9 h1:k0KHPX68oimM6RtlkRSZJunlG+bvTXpg1NL0OteGsKE=
 github.com/lemon4ksan/aoni-browser v0.0.0-20260920194424-d6ec449ea3f9/go.mod h1:yhBEMO8+3vClCQkkvA+XX2H2/wWQUbhl0QM1NmrDmbA=
-github.com/lemon4ksan/foundation v0.0.0-20260920191713-7709c688b2d7 h1:gGzm8Rz3R9SqMvDf9TQsNcbpHuTQxRbkhhik2T17eyU=
-github.com/lemon4ksan/foundation v0.0.0-20260920191713-7709c688b2d7/go.mod h1:mKZ+py0Jq9/teeK0cvjFUajx/DqJ3UiCvez0mwjhw8Y=
-github.com/lemon4ksan/mach v0.0.0-20260920191812-bb7ae0771871 h1:pZbTlhT9V9UEjjKHTsA2bLofLpzMscJ9FQIjgsrYZxI=
-github.com/lemon4ksan/mach v0.0.0-20260920191812-bb7ae0771871/go.mod h1:igV/o2BgaROAqXeYK5GQPYL2noZ3Q1BFX9AeYRhINMs=
+github.com/lemon4ksan/foundation v0.0.0-20260923050528-dc5d9a8c9c6b h1:Kfnzk+nDCztX03T1mU9CIpVRxylF6m7prs8RC4VGfCg=
+github.com/lemon4ksan/mach v0.0.0-20260923050623-74d65af4cf4a h1:VvDOlTSa+FB427vVvEBSZHF0zokDoT6OfOaE/Fbh7GU=
 github.com/refraction-networking/utls v1.8.2 h1:j4Q1gJj0xngdeH+Ox/qND11aEfhpgoEvV+S9iJ2IdQo=
 github.com/refraction-networking/utls v1.8.2/go.mod h1:jkSOEkLqn+S/jtpEHPOsVv/4V4EVnelwbMQl4vCWXAM=
 github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0tI/otEQ=

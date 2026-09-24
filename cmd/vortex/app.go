@@ -14,6 +14,8 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/lemon4ksan/foundation/tuikit"
+
 	"github.com/lemon4ksan/vortex/internal/base"
 )
 
@@ -105,6 +107,10 @@ func (a *App) Run(ctx context.Context, args []string) error {
 	stderr := a.Stderr
 	if stderr == nil {
 		stderr = os.Stderr
+	}
+
+	if !tuikit.ProbeTerminal(stdout) || os.Getenv("NO_COLOR") != "" || os.Getenv("TERM") == "dumb" {
+		tuikit.SetColorEnabled(false)
 	}
 
 	if len(args) == 0 {

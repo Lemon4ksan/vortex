@@ -69,7 +69,7 @@ func (c *CmdPGO) Run(ctx context.Context, args []string, stdout, stderr io.Write
 		outPath = filepath.Join(rootDir, outPath)
 	}
 
-	fmt.Fprintf(stdout, "\n⚡ Vortex Profile-Guided Optimization (PGO) Pipeline\n")
+	fmt.Fprintf(stdout, "\n◆ Vortex Profile-Guided Optimization (PGO) Pipeline\n")
 	fmt.Fprintf(stdout, "Target:     %s (benchtime=%s)\n", targetPkg, *benchTimeFlag)
 	fmt.Fprintf(stdout, "Output:     %s\n\n", outPath)
 

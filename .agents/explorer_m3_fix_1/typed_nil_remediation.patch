@@ -1,0 +1,371 @@
+diff --git a/pkg/cache/errors.go b/pkg/cache/errors.go
+--- a/pkg/cache/errors.go
++++ b/pkg/cache/errors.go
+@@ -83,7 +83,7 @@ func IsNotFound(err error) bool {
+ 		return true
+ 	}
+ 
+-	if cErr, ok := errors.AsType[*CacheError](err); ok {
++	if cErr, ok := errors.AsType[*CacheError](err); ok && cErr != nil {
+ 		return errors.Is(cErr.Err, ErrSessionNotFound) ||
+ 			errors.Is(cErr.Err, ErrSecretNotFound) ||
+ 			errors.Is(cErr.Err, os.ErrNotExist)
+@@ -101,7 +101,7 @@ func IsCorrupt(err error) bool {
+ 		return true
+ 	}
+ 
+-	if cErr, ok := errors.AsType[*CacheError](err); ok {
++	if cErr, ok := errors.AsType[*CacheError](err); ok && cErr != nil {
+ 		return errors.Is(cErr.Err, ErrCorruptCache)
+ 	}
+ 
+diff --git a/pkg/cache/errors_test.go b/pkg/cache/errors_test.go
+--- a/pkg/cache/errors_test.go
++++ b/pkg/cache/errors_test.go
+@@ -49,6 +49,9 @@ func TestCacheErrors_IsNotFound(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, cache.IsNotFound(nil))
++	var typedNil *cache.CacheError
++	require.False(t, cache.IsNotFound(typedNil))
++	require.False(t, cache.IsNotFound(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestCacheErrors_IsCorrupt(t *testing.T) {
+@@ -74,6 +77,9 @@ func TestCacheErrors_IsCorrupt(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, cache.IsCorrupt(nil))
++	var typedNil *cache.CacheError
++	require.False(t, cache.IsCorrupt(typedNil))
++	require.False(t, cache.IsCorrupt(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestCacheError_ErrorAndUnwrap(t *testing.T) {
+diff --git a/pkg/diff/errors.go b/pkg/diff/errors.go
+--- a/pkg/diff/errors.go
++++ b/pkg/diff/errors.go
+@@ -83,7 +83,7 @@ func IsNotFound(err error) bool {
+ 		return true
+ 	}
+ 
+-	if dErr, ok := errors.AsType[*DiffError](err); ok {
++	if dErr, ok := errors.AsType[*DiffError](err); ok && dErr != nil {
+ 		return errors.Is(dErr.Err, ErrFrameNotFound)
+ 	}
+ 
+@@ -99,7 +99,7 @@ func IsConflict(err error) bool {
+ 		return true
+ 	}
+ 
+-	if dErr, ok := errors.AsType[*DiffError](err); ok {
++	if dErr, ok := errors.AsType[*DiffError](err); ok && dErr != nil {
+ 		return errors.Is(dErr.Err, ErrConflict)
+ 	}
+ 
+@@ -115,7 +115,7 @@ func IsEmpty(err error) bool {
+ 		return true
+ 	}
+ 
+-	if dErr, ok := errors.AsType[*DiffError](err); ok {
++	if dErr, ok := errors.AsType[*DiffError](err); ok && dErr != nil {
+ 		return errors.Is(dErr.Err, ErrStackEmpty)
+ 	}
+ 
+diff --git a/pkg/diff/errors_test.go b/pkg/diff/errors_test.go
+--- a/pkg/diff/errors_test.go
++++ b/pkg/diff/errors_test.go
+@@ -41,6 +41,9 @@ func TestDiffErrors_IsNotFound(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, diff.IsNotFound(nil))
++	var typedNil *diff.DiffError
++	require.False(t, diff.IsNotFound(typedNil))
++	require.False(t, diff.IsNotFound(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestDiffErrors_IsConflict(t *testing.T) {
+@@ -65,6 +68,9 @@ func TestDiffErrors_IsConflict(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, diff.IsConflict(nil))
++	var typedNil *diff.DiffError
++	require.False(t, diff.IsConflict(typedNil))
++	require.False(t, diff.IsConflict(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestDiffErrors_IsEmpty(t *testing.T) {
+@@ -92,6 +98,9 @@ func TestDiffErrors_IsEmpty(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, diff.IsEmpty(nil))
++	var typedNil *diff.DiffError
++	require.False(t, diff.IsEmpty(typedNil))
++	require.False(t, diff.IsEmpty(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestDiffError_ErrorAndUnwrap(t *testing.T) {
+diff --git a/pkg/git/errors.go b/pkg/git/errors.go
+--- a/pkg/git/errors.go
++++ b/pkg/git/errors.go
+@@ -80,7 +80,7 @@ func IsNotRepository(err error) bool {
+ 		return true
+ 	}
+ 
+-	if gErr, ok := errors.AsType[*GitError](err); ok {
++	if gErr, ok := errors.AsType[*GitError](err); ok && gErr != nil {
+ 		if errors.Is(gErr.Err, ErrNotRepository) {
+ 			return true
+ 		}
+@@ -98,7 +98,7 @@ func IsNotFound(err error) bool {
+ 		return true
+ 	}
+ 
+-	if gErr, ok := errors.AsType[*GitError](err); ok {
++	if gErr, ok := errors.AsType[*GitError](err); ok && gErr != nil {
+ 		return errors.Is(gErr.Err, ErrBranchNotFound)
+ 	}
+ 
+diff --git a/pkg/git/errors_test.go b/pkg/git/errors_test.go
+--- a/pkg/git/errors_test.go
++++ b/pkg/git/errors_test.go
+@@ -44,6 +44,9 @@ func TestGitErrors_IsNotRepository(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, git.IsNotRepository(nil))
++	var typedNil *git.GitError
++	require.False(t, git.IsNotRepository(typedNil))
++	require.False(t, git.IsNotRepository(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestGitErrors_IsNotFound(t *testing.T) {
+@@ -69,6 +72,9 @@ func TestGitErrors_IsNotFound(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, git.IsNotFound(nil))
++	var typedNil *git.GitError
++	require.False(t, git.IsNotFound(typedNil))
++	require.False(t, git.IsNotFound(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestGitError_ErrorAndUnwrap(t *testing.T) {
+diff --git a/pkg/lint/errors.go b/pkg/lint/errors.go
+--- a/pkg/lint/errors.go
++++ b/pkg/lint/errors.go
+@@ -80,7 +80,7 @@ func IsLintFailure(err error) bool {
+ 		return true
+ 	}
+ 
+-	if lErr, ok := errors.AsType[*LintError](err); ok {
++	if lErr, ok := errors.AsType[*LintError](err); ok && lErr != nil {
+ 		return errors.Is(lErr.Err, ErrLintFailure)
+ 	}
+ 
+@@ -96,7 +96,7 @@ func IsNotFound(err error) bool {
+ 		return true
+ 	}
+ 
+-	if lErr, ok := errors.AsType[*LintError](err); ok {
++	if lErr, ok := errors.AsType[*LintError](err); ok && lErr != nil {
+ 		return errors.Is(lErr.Err, ErrRuleNotFound)
+ 	}
+ 
+diff --git a/pkg/lint/errors_test.go b/pkg/lint/errors_test.go
+--- a/pkg/lint/errors_test.go
++++ b/pkg/lint/errors_test.go
+@@ -43,6 +43,9 @@ func TestLintErrors_IsLintFailure(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, lint.IsLintFailure(nil))
++	var typedNil *lint.LintError
++	require.False(t, lint.IsLintFailure(typedNil))
++	require.False(t, lint.IsLintFailure(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestLintErrors_IsNotFound(t *testing.T) {
+@@ -67,6 +70,9 @@ func TestLintErrors_IsNotFound(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, lint.IsNotFound(nil))
++	var typedNil *lint.LintError
++	require.False(t, lint.IsNotFound(typedNil))
++	require.False(t, lint.IsNotFound(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestLintError_ErrorAndUnwrap(t *testing.T) {
+diff --git a/pkg/parser/errors.go b/pkg/parser/errors.go
+--- a/pkg/parser/errors.go
++++ b/pkg/parser/errors.go
+@@ -81,7 +81,7 @@ func IsSyntaxError(err error) bool {
+ 		return true
+ 	}
+ 
+-	if pErr, ok := errors.AsType[*ParseError](err); ok {
++	if pErr, ok := errors.AsType[*ParseError](err); ok && pErr != nil {
+ 		return errors.Is(pErr.Err, ErrSyntaxError)
+ 	}
+ 
+@@ -97,7 +97,7 @@ func IsNotFound(err error) bool {
+ 		return true
+ 	}
+ 
+-	if pErr, ok := errors.AsType[*ParseError](err); ok {
++	if pErr, ok := errors.AsType[*ParseError](err); ok && pErr != nil {
+ 		return errors.Is(pErr.Err, ErrContractNotFound)
+ 	}
+ 
+diff --git a/pkg/parser/errors_test.go b/pkg/parser/errors_test.go
+--- a/pkg/parser/errors_test.go
++++ b/pkg/parser/errors_test.go
+@@ -45,6 +45,9 @@ func TestParserErrors_IsSyntaxError(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, parser.IsSyntaxError(nil))
++	var typedNil *parser.ParseError
++	require.False(t, parser.IsSyntaxError(typedNil))
++	require.False(t, parser.IsSyntaxError(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestParserErrors_IsNotFound(t *testing.T) {
+@@ -69,6 +72,9 @@ func TestParserErrors_IsNotFound(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, parser.IsNotFound(nil))
++	var typedNil *parser.ParseError
++	require.False(t, parser.IsNotFound(typedNil))
++	require.False(t, parser.IsNotFound(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestParseError_ErrorAndUnwrap(t *testing.T) {
+diff --git a/pkg/pipeline/errors.go b/pkg/pipeline/errors.go
+--- a/pkg/pipeline/errors.go
++++ b/pkg/pipeline/errors.go
+@@ -80,7 +80,7 @@ func IsPipelineAborted(err error) bool {
+ 		return true
+ 	}
+ 
+-	if pErr, ok := errors.AsType[*PipelineError](err); ok {
++	if pErr, ok := errors.AsType[*PipelineError](err); ok && pErr != nil {
+ 		return errors.Is(pErr.Err, ErrPipelineAborted)
+ 	}
+ 
+@@ -96,7 +96,7 @@ func IsNotFound(err error) bool {
+ 		return true
+ 	}
+ 
+-	if pErr, ok := errors.AsType[*PipelineError](err); ok {
++	if pErr, ok := errors.AsType[*PipelineError](err); ok && pErr != nil {
+ 		return errors.Is(pErr.Err, ErrNoContractsFound)
+ 	}
+ 
+diff --git a/pkg/pipeline/errors_test.go b/pkg/pipeline/errors_test.go
+--- a/pkg/pipeline/errors_test.go
++++ b/pkg/pipeline/errors_test.go
+@@ -41,6 +41,9 @@ func TestPipelineErrors_IsPipelineAborted(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, pipeline.IsPipelineAborted(nil))
++	var typedNil *pipeline.PipelineError
++	require.False(t, pipeline.IsPipelineAborted(typedNil))
++	require.False(t, pipeline.IsPipelineAborted(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestPipelineErrors_IsNotFound(t *testing.T) {
+@@ -66,6 +69,9 @@ func TestPipelineErrors_IsNotFound(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, pipeline.IsNotFound(nil))
++	var typedNil *pipeline.PipelineError
++	require.False(t, pipeline.IsNotFound(typedNil))
++	require.False(t, pipeline.IsNotFound(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestPipelineError_ErrorAndUnwrap(t *testing.T) {
+diff --git a/pkg/project/errors.go b/pkg/project/errors.go
+--- a/pkg/project/errors.go
++++ b/pkg/project/errors.go
+@@ -90,7 +90,7 @@ func IsNotFound(err error) bool {
+ 		return true
+ 	}
+ 
+-	if pErr, ok := errors.AsType[*ProjectError](err); ok {
++	if pErr, ok := errors.AsType[*ProjectError](err); ok && pErr != nil {
+ 		return errors.Is(pErr.Err, ErrWorkspaceNotFound) ||
+ 			errors.Is(pErr.Err, ErrConfigNotFound) ||
+ 			errors.Is(pErr.Err, ErrContractNotFound) ||
+@@ -109,7 +109,7 @@ func IsStale(err error) bool {
+ 		return true
+ 	}
+ 
+-	if pErr, ok := errors.AsType[*ProjectError](err); ok {
++	if pErr, ok := errors.AsType[*ProjectError](err); ok && pErr != nil {
+ 		return errors.Is(pErr.Err, ErrStaleCodegen)
+ 	}
+ 
+diff --git a/pkg/project/errors_test.go b/pkg/project/errors_test.go
+--- a/pkg/project/errors_test.go
++++ b/pkg/project/errors_test.go
+@@ -48,6 +48,9 @@ func TestProjectErrors_IsNotFound(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, project.IsNotFound(nil))
++	var typedNil *project.ProjectError
++	require.False(t, project.IsNotFound(typedNil))
++	require.False(t, project.IsNotFound(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestProjectErrors_IsStale(t *testing.T) {
+@@ -73,6 +76,9 @@ func TestProjectErrors_IsStale(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, project.IsStale(nil))
++	var typedNil *project.ProjectError
++	require.False(t, project.IsStale(typedNil))
++	require.False(t, project.IsStale(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestProjectError_ErrorAndUnwrap(t *testing.T) {
+diff --git a/pkg/spec/errors.go b/pkg/spec/errors.go
+--- a/pkg/spec/errors.go
++++ b/pkg/spec/errors.go
+@@ -81,7 +81,7 @@ func IsNotFound(err error) bool {
+ 		return true
+ 	}
+ 
+-	if sErr, ok := errors.AsType[*SpecError](err); ok {
++	if sErr, ok := errors.AsType[*SpecError](err); ok && sErr != nil {
+ 		return errors.Is(sErr.Err, ErrSpecNotFound) || errors.Is(sErr.Err, os.ErrNotExist)
+ 	}
+ 
+@@ -97,7 +97,7 @@ func IsUnsupportedFormat(err error) bool {
+ 		return true
+ 	}
+ 
+-	if sErr, ok := errors.AsType[*SpecError](err); ok {
++	if sErr, ok := errors.AsType[*SpecError](err); ok && sErr != nil {
+ 		return errors.Is(sErr.Err, ErrUnsupportedFormat)
+ 	}
+ 
+diff --git a/pkg/spec/errors_test.go b/pkg/spec/errors_test.go
+--- a/pkg/spec/errors_test.go
++++ b/pkg/spec/errors_test.go
+@@ -44,6 +44,9 @@ func TestSpecErrors_IsNotFound(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, spec.IsNotFound(nil))
++	var typedNil *spec.SpecError
++	require.False(t, spec.IsNotFound(typedNil))
++	require.False(t, spec.IsNotFound(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestSpecErrors_IsUnsupportedFormat(t *testing.T) {
+@@ -69,6 +72,9 @@ func TestSpecErrors_IsUnsupportedFormat(t *testing.T) {
+ 
+ 	// 5. Nil error
+ 	require.False(t, spec.IsUnsupportedFormat(nil))
++	var typedNil *spec.SpecError
++	require.False(t, spec.IsUnsupportedFormat(typedNil))
++	require.False(t, spec.IsUnsupportedFormat(fmt.Errorf("wrap: %w", typedNil)))
+ }
+ 
+ func TestSpecError_ErrorAndUnwrap(t *testing.T) {

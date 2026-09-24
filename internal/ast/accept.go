@@ -73,7 +73,7 @@ func (c *CmdAccept) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 
 	p := vparser.NewParser()
 
-	fmt.Fprintf(stdout, "⚡ [vortex ast accept] Merging Proposal from %q into local master...\n\n", targetRef)
+	fmt.Fprintf(stdout, "◆ [vortex ast accept] Merging Proposal from %q into local master...\n\n", targetRef)
 
 	patchedFiles := 0
 
@@ -117,7 +117,7 @@ func (c *CmdAccept) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 
 	// Cascade code generation
 	if !*noGen {
-		fmt.Fprintf(stdout, "\n⚡ Recompiling network layer...\n")
+		fmt.Fprintf(stdout, "\n◆ Recompiling network layer...\n")
 
 		b := builder.New(builder.Config{})
 		for _, ct := range cfg.Contracts {
@@ -132,7 +132,7 @@ func (c *CmdAccept) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 		fmt.Fprintf(stdout, "✔ Network layer recompiled successfully!\n")
 	}
 
-	fmt.Fprintf(stdout, "\n✨ Successfully merged proposal %q! Working tree is 100%% synchronized.\n", targetRef)
+	fmt.Fprintf(stdout, "\n✔ Successfully merged proposal %q! Working tree is 100%% synchronized.\n", targetRef)
 
 	return nil
 }

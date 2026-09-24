@@ -1026,6 +1026,33 @@ func (p *Parser) extractGoType(expr ast.Expr) ir.GoTypeIR {
 
 		goType.Name = fmt.Sprintf("func(%s)%s", strings.Join(params, ", "), resStr)
 
+	case *ast.ParenExpr:
+		return p.extractGoType(t.X)
+
+	case *ast.IndexExpr:
+		base := p.extractGoType(t.X)
+		elem := p.extractGoType(t.Index)
+		goType = base
+		goType.ElemType = elem.Name
+		goType.Name = fmt.Sprintf("%s[%s]", base.Name, elem.Name)
+		goType.IsCustomType = true
+
+	case *ast.IndexListExpr:
+		base := p.extractGoType(t.X)
+		indices := make([]string, 0, len(t.Indices))
+		for _, idx := range t.Indices {
+			it := p.extractGoType(idx)
+			indices = append(indices, it.Name)
+		}
+		goType = base
+		if len(indices) == 1 {
+			goType.ElemType = indices[0]
+		} else {
+			goType.ElemType = strings.Join(indices, ", ")
+		}
+		goType.Name = fmt.Sprintf("%s[%s]", base.Name, strings.Join(indices, ", "))
+		goType.IsCustomType = true
+
 	default:
 		_ = buf
 		goType.Name = "any"
@@ -1079,6 +1106,11 @@ func isPrimitive(s string) bool {
 
 func isDTOQueryStruct(name string) bool {
 	if isPrimitive(name) {
+		return false
+	}
+
+	cleanName := strings.TrimPrefix(name, "*")
+	if strings.HasPrefix(cleanName, "generic.Optional[") || strings.HasPrefix(cleanName, "Optional[") {
 		return false
 	}
 

@@ -305,7 +305,7 @@ func (c *CmdDiff) runGitDiff(
 
 	p := vparser.NewParser()
 
-	fmt.Fprintf(stdout, "⚡ [vortex diff] Comparing working tree against '%s':\n\n", targetRef)
+	fmt.Fprintf(stdout, "◆ [vortex diff] Comparing working tree against '%s':\n\n", targetRef)
 
 	totalDeltas := 0
 
@@ -655,7 +655,7 @@ func (c *CmdDiff) runHARDifferential(
 		return nil
 	}
 
-	fmt.Fprintf(stdout, "🔍 Traffic Diff (%s ↔ %s): %d parameter delta(s)\n\n",
+	fmt.Fprintf(stdout, "◆ Traffic Diff (%s ↔ %s): %d parameter delta(s)\n\n",
 		filepath.Base(fileA), filepath.Base(fileB), len(deltas))
 
 	grouped := make(map[string][]harEntryDiff)
@@ -672,7 +672,7 @@ func (c *CmdDiff) runHARDifferential(
 
 	for _, gKey := range groupOrder {
 		items := grouped[gKey]
-		fmt.Fprintf(stdout, "📍 %s\n", gKey)
+		fmt.Fprintf(stdout, "↳ %s\n", gKey)
 
 		for _, it := range items {
 			tagInfo := ""
@@ -680,7 +680,7 @@ func (c *CmdDiff) runHARDifferential(
 				tagInfo = fmt.Sprintf(" (tag %s)", it.Tag)
 			}
 
-			fmt.Fprintf(stdout, "  • %s%s: %s ➔ %s      ➜ vortex ast rename --type=%s --field=%s --to=<NAME>\n",
+			fmt.Fprintf(stdout, "  • %s%s: %s ↳ %s      ↳ vortex ast rename --type=%s --field=%s --to=<NAME>\n",
 				it.Field, tagInfo, it.OldVal, it.NewVal, it.Struct, it.Field)
 		}
 

@@ -16,8 +16,8 @@ func BenchmarkDocumentBuilder_Build(b *testing.B) {
 
 	for b.Loop() {
 		doc := text.NewDocument().
-			Title("🚀", "Benchmark").
-			Section("📦", "Details").
+			Title("◆", "Benchmark").
+			Section("◆", "Details").
 			Field("Key1", "Val1").
 			FieldCode("Key2", "Val2").
 			Paragraph("Some text").
@@ -31,8 +31,8 @@ func BenchmarkDocumentBuilder_Build(b *testing.B) {
 
 func BenchmarkDocumentBuilder_RenderMarkdown(b *testing.B) {
 	doc := text.NewDocument().
-		Title("🚀", "Benchmark").
-		Section("📦", "Details").
+		Title("◆", "Benchmark").
+		Section("◆", "Details").
 		Field("Key1", "Val1").
 		FieldCode("Key2", "Val2").
 		Paragraph("Some text").

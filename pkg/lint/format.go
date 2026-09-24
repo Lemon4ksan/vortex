@@ -5,27 +5,19 @@
 package lint
 
 import (
+	"bytes"
 	"cmp"
 	"encoding/json"
 	"fmt"
 	"io"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 
-	"github.com/lemon4ksan/vortex/pkg/version"
-)
+	"github.com/lemon4ksan/foundation/tuikit"
 
-// ANSI color codes
-const (
-	ansiReset  = "\033[0m"
-	ansiBold   = "\033[1m"
-	ansiDim    = "\033[2m"
-	ansiRed    = "\033[31m"
-	ansiGreen  = "\033[32m"
-	ansiYellow = "\033[33m"
-	ansiBlue   = "\033[34m"
-	ansiCyan   = "\033[36m"
+	"github.com/lemon4ksan/vortex/pkg/version"
 )
 
 // FormatReport writes a formatted terminal report of discovered diagnostics.
@@ -34,26 +26,30 @@ func FormatReport(w io.Writer, target string, report *Report) {
 		return
 	}
 
-	fmt.Fprintf(w, "%s%s⚡ Vortex Contract Inspector%s\n", ansiBold, ansiCyan, ansiReset)
-	fmt.Fprintf(w, "%sTarget: %s (%d services, %d methods across %d files)%s\n\n",
-		ansiDim, target, report.ServicesChecked, report.MethodsChecked, report.FilesChecked, ansiReset)
+	useColor := tuikit.IsInteractive(w)
+	var buf bytes.Buffer
+
+	fmt.Fprintln(&buf, tuikit.RenderHeader("◆ Vortex Contract Inspector"))
+	fmt.Fprintf(&buf, "%s\n\n", tuikit.Dim(fmt.Sprintf("Target: %s (%d services, %d methods across %d files)",
+		target, report.ServicesChecked, report.MethodsChecked, report.FilesChecked)))
 
 	if len(report.Diagnostics) == 0 {
 		if report.SuppressedCount > 0 {
 			fmt.Fprintf(
-				w,
-				"%s%s✔ All contracts are valid and synchronized!%s %s(%d warnings suppressed via //vortex:ignore)%s\n",
-				ansiBold,
-				ansiGreen,
-				ansiReset,
-				ansiDim,
-				report.SuppressedCount,
-				ansiReset,
+				&buf,
+				"%s %s\n",
+				tuikit.Bold(tuikit.Green("✔ All contracts are valid and synchronized!")),
+				tuikit.Dim(fmt.Sprintf("(%d warnings suppressed via //vortex:ignore)", report.SuppressedCount)),
 			)
 		} else {
-			fmt.Fprintf(w, "%s%s✔ All contracts are valid and synchronized!%s\n", ansiBold, ansiGreen, ansiReset)
+			fmt.Fprintln(&buf, tuikit.Bold(tuikit.Green("✔ All contracts are valid and synchronized!")))
 		}
 
+		out := buf.String()
+		if !useColor {
+			out = tuikit.StripANSI(out)
+		}
+		_, _ = io.WriteString(w, out)
 		return
 	}
 
@@ -76,89 +72,127 @@ func FormatReport(w io.Writer, target string, report *Report) {
 	sortDiagnostics(infos)
 
 	if len(errs) > 0 {
-		fmt.Fprintf(w, "%s%s◆ Errors (%d)%s\n", ansiBold, ansiRed, len(errs), ansiReset)
+		fmt.Fprintln(&buf, tuikit.Bold(tuikit.Red(fmt.Sprintf("◆ Errors (%d)", len(errs)))))
 
 		for _, d := range errs {
-			printDiagnostic(w, d, ansiRed)
+			printDiagnostic(&buf, d, tuikit.Red)
 		}
 
-		fmt.Fprintln(w)
+		fmt.Fprintln(&buf)
 	}
 
 	if len(warns) > 0 {
-		fmt.Fprintf(w, "%s%s◆ Warnings & Suggestions (%d)%s\n", ansiBold, ansiYellow, len(warns), ansiReset)
+		fmt.Fprintln(&buf, tuikit.Bold(tuikit.Yellow(fmt.Sprintf("◆ Warnings & Suggestions (%d)", len(warns)))))
 
 		for _, d := range warns {
-			printDiagnostic(w, d, ansiYellow)
+			printDiagnostic(&buf, d, tuikit.Yellow)
 		}
 
-		fmt.Fprintln(w)
+		fmt.Fprintln(&buf)
 	}
 
 	if len(infos) > 0 {
-		fmt.Fprintf(w, "%s%s◆ Info (%d)%s\n", ansiBold, ansiBlue, len(infos), ansiReset)
+		fmt.Fprintln(&buf, tuikit.Bold(tuikit.Cyan(fmt.Sprintf("◆ Info (%d)", len(infos)))))
 
 		for _, d := range infos {
-			printDiagnostic(w, d, ansiBlue)
+			printDiagnostic(&buf, d, tuikit.Cyan)
 		}
 
-		fmt.Fprintln(w)
+		fmt.Fprintln(&buf)
 	}
 
-	// Summary with colored severity breakdown and rule count list
-	fmt.Fprintf(w, "%sSummary:%s ", ansiBold, ansiReset)
+	// Summary with colored severity breakdown and rule count table
+	fmt.Fprintf(&buf, "%s ", tuikit.Bold("Summary:"))
 
 	var parts []string
 	if report.Errors() > 0 {
-		parts = append(parts, fmt.Sprintf("%s%d error(s)%s", ansiRed, report.Errors(), ansiReset))
+		parts = append(parts, tuikit.Red(fmt.Sprintf("%d error(s)", report.Errors())))
 	}
 
 	if report.Warnings() > 0 {
-		parts = append(parts, fmt.Sprintf("%s%d warning(s)%s", ansiYellow, report.Warnings(), ansiReset))
+		parts = append(parts, tuikit.Yellow(fmt.Sprintf("%d warning(s)", report.Warnings())))
 	}
 
 	if report.FixableCount() > 0 {
-		parts = append(parts, fmt.Sprintf("%s%d auto-fixable%s", ansiGreen, report.FixableCount(), ansiReset))
+		parts = append(parts, tuikit.Green(fmt.Sprintf("%d auto-fixable", report.FixableCount())))
 	}
 
 	if report.SuppressedCount > 0 {
-		parts = append(parts, fmt.Sprintf("%s%d suppressed%s", ansiDim, report.SuppressedCount, ansiReset))
+		parts = append(parts, tuikit.Dim(fmt.Sprintf("%d suppressed", report.SuppressedCount)))
 	}
 
-	fmt.Fprintln(w, strings.Join(parts, ", "))
+	fmt.Fprintln(&buf, strings.Join(parts, ", "))
 
 	type ruleStat struct {
-		ruleKey string
-		count   int
+		ruleID   string
+		ruleName string
+		severity Severity
+		count    int
 	}
 
-	ruleMap := make(map[string]int)
+	ruleMap := make(map[string]*ruleStat)
 	for _, d := range report.Diagnostics {
-		key := fmt.Sprintf("%s (%s)", d.RuleID, d.RuleName)
-		ruleMap[key]++
+		if s, exists := ruleMap[d.RuleID]; exists {
+			s.count++
+		} else {
+			ruleMap[d.RuleID] = &ruleStat{
+				ruleID:   d.RuleID,
+				ruleName: d.RuleName,
+				severity: d.Severity,
+				count:    1,
+			}
+		}
 	}
 
-	var stats []ruleStat
-	for k, v := range ruleMap {
-		stats = append(stats, ruleStat{ruleKey: k, count: v})
+	var stats []*ruleStat
+	for _, s := range ruleMap {
+		stats = append(stats, s)
 	}
 
-	slices.SortFunc(stats, func(a, b ruleStat) int {
+	slices.SortFunc(stats, func(a, b *ruleStat) int {
 		if a.count != b.count {
 			return cmp.Compare(b.count, a.count)
 		}
 
-		return cmp.Compare(a.ruleKey, b.ruleKey)
+		return cmp.Compare(a.ruleID, b.ruleID)
 	})
 
-	for _, s := range stats {
-		fmt.Fprintf(w, "* %s: %d\n", s.ruleKey, s.count)
+	if len(stats) > 0 {
+		fmt.Fprintln(&buf)
+		tbl := tuikit.NewTable("RULE", "SEVERITY", "COUNT")
+		tbl.SetIndent(2)
+		tbl.SetAlignment(2, tuikit.AlignRight)
+
+		for _, s := range stats {
+			ruleLabel := fmt.Sprintf("%s (%s)", s.ruleID, s.ruleName)
+			sevLabel := string(s.severity)
+			switch s.severity {
+			case SeverityError:
+				sevLabel = tuikit.Red(sevLabel)
+			case SeverityWarning:
+				sevLabel = tuikit.Yellow(sevLabel)
+			default:
+				sevLabel = tuikit.Cyan(sevLabel)
+			}
+			tbl.AddRow(ruleLabel, sevLabel, strconv.Itoa(s.count))
+		}
+
+		_ = tbl.Render(&buf)
 	}
 
 	if report.FixableCount() > 0 {
-		fmt.Fprintf(w, "\n%sRun `vortex check --fix` to automatically resolve %d safe issue(s).%s\n",
-			ansiCyan, report.FixableCount(), ansiReset)
+		fixMsg := fmt.Sprintf(
+			"Run `vortex check --fix` to automatically resolve %d safe issue(s).",
+			report.FixableCount(),
+		)
+		fmt.Fprintf(&buf, "\n%s\n", tuikit.Cyan(fixMsg))
 	}
+
+	out := buf.String()
+	if !useColor {
+		out = tuikit.StripANSI(out)
+	}
+	_, _ = io.WriteString(w, out)
 }
 
 func sortDiagnostics(diags []Diagnostic) {
@@ -172,7 +206,7 @@ func sortDiagnostics(diags []Diagnostic) {
 	})
 }
 
-func printDiagnostic(w io.Writer, d Diagnostic, color string) {
+func printDiagnostic(w io.Writer, d Diagnostic, colorFn func(string) string) {
 	line := d.Line
 	if line <= 0 {
 		line = 1
@@ -190,15 +224,20 @@ func printDiagnostic(w io.Writer, d Diagnostic, color string) {
 
 	loc := fmt.Sprintf("%s:%d:%d", filePath, line, col)
 
-	fmt.Fprintf(w, "  ↳ %s[%s:%s]%s %s%s%s\n", color, d.RuleID, d.RuleName, ansiReset, ansiBold, loc, ansiReset)
+	tag := fmt.Sprintf("[%s:%s]", d.RuleID, d.RuleName)
+	if colorFn != nil {
+		tag = colorFn(tag)
+	}
+
+	fmt.Fprintf(w, "  ↳ %s %s\n", tag, tuikit.Bold(loc))
 	fmt.Fprintf(w, "    %s\n", d.Message)
 
 	if d.Suggestion != "" && !strings.Contains(d.Suggestion, "vortex check --fix") {
-		fmt.Fprintf(w, "    %s↳ Suggestion:%s %s\n", ansiCyan, ansiReset, d.Suggestion)
+		fmt.Fprintf(w, "    %s %s\n", tuikit.Cyan("↳ Suggestion:"), d.Suggestion)
 	}
 
 	if !d.Fixable() {
-		fmt.Fprintf(w, "    %s↳ To suppress:%s //vortex:ignore %s\n", ansiDim, ansiReset, d.RuleName)
+		fmt.Fprintf(w, "    %s //vortex:ignore %s\n", tuikit.Dim("↳ To suppress:"), d.RuleName)
 	}
 }
 

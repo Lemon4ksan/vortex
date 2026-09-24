@@ -89,7 +89,7 @@ func (r *Reporter) RenderDiagnostics(diags []lint.Diagnostic, format string) err
 		}
 
 		doc := text.NewDocument().
-			Heading(2, "🔍", fmt.Sprintf("Contract Diagnostics (%d issues)", len(diags)))
+			Heading(2, "◆", fmt.Sprintf("Contract Diagnostics (%d issues)", len(diags)))
 		defer doc.Release()
 
 		for _, d := range diags {

@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package inspector provides a local HTTP traffic inspector and real-time web dashboard.
 package inspector
 
 import (
@@ -23,7 +22,7 @@ import (
 	"github.com/lemon4ksan/aoni/option"
 	"github.com/lemon4ksan/aoni/pipeline"
 	"github.com/lemon4ksan/aoni/x/telemetry"
-	"github.com/lemon4ksan/foundation/net/http/header"
+	"github.com/lemon4ksan/mach/proto/http/header"
 	"github.com/lemon4ksan/foundation/silicon/offheap"
 )
 

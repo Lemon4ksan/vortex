@@ -443,7 +443,7 @@ func (c *CmdBench) Run(ctx context.Context, args []string, stdout, stderr io.Wri
 	if !*jsonFlag {
 		fmt.Fprintf(stdout, "[7/7] OS Network (TCP Loopback)     : %12.0f RPS      (127.0.0.1 Socket)\n", osNetRPS)
 		fmt.Fprintln(stdout, "==========================================================================")
-		fmt.Fprintf(stdout, "⚡ Silicon Score: %d pts\n", score)
+		fmt.Fprintf(stdout, "◆ Silicon Score: %d pts\n", score)
 		fmt.Fprintln(stdout, "==========================================================================")
 	} else {
 		report := BenchmarkReport{

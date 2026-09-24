@@ -122,7 +122,7 @@ func (c *CmdLog) Run(ctx context.Context, args []string, stdout, stderr io.Write
 	}
 
 	for _, tl := range allTimelines {
-		fmt.Fprintf(stdout, "⚡ Vortex API Contract Timeline: %s (%s)\n\n", tl.FilePath, tl.Service)
+		fmt.Fprintf(stdout, "◆ Vortex API Contract Timeline: %s (%s)\n\n", tl.FilePath, tl.Service)
 
 		for _, v := range tl.Versions {
 			sourceSuffix := ""
@@ -183,7 +183,7 @@ func (c *CmdLog) runGitLog(ctx context.Context, files []string, limit int, jsonO
 			continue
 		}
 
-		fmt.Fprintf(stdout, "⚡ Vortex API Git History: %s\n\n", relPath)
+		fmt.Fprintf(stdout, "◆ Vortex API Git History: %s\n\n", relPath)
 
 		for _, commit := range commits {
 			shortHash := commit.Hash

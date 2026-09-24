@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package spec provides the programmatic Abstract Syntax Tree (AST)
-// and schema definitions for declaring Vortex Universal Browser Attestation Oracles.
 package spec
 
 // InterceptSource identifies where the attestation token/signature is extracted from.

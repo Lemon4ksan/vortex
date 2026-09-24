@@ -311,7 +311,7 @@ func (c *CmdDoctor) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 	}
 
 	// Render Terminal Output
-	fmt.Fprintf(stdout, "%s\n", tui.Bold(tui.Cyan("⚡ Vortex Doctor — Workspace Health Diagnostic")))
+	fmt.Fprintf(stdout, "%s\n", tui.Bold(tui.Cyan("◆ Vortex Doctor — Workspace Health Diagnostic")))
 	fmt.Fprintf(
 		stdout,
 		"Workspace: %s %s\n\n",
@@ -321,17 +321,17 @@ func (c *CmdDoctor) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 
 	maxNameWidth := 0
 	for _, c := range rep.Checks {
-		if len(c.Name) > maxNameWidth {
-			maxNameWidth = len(c.Name)
+		if w := tui.VisibleWidth(c.Name); w > maxNameWidth {
+			maxNameWidth = w
 		}
 	}
 
 	for _, check := range rep.Checks {
 		badge := tui.BadgePassed()
 		if !check.Passed {
-			badge = tui.BadgeFail()
+			badge = tui.Badge("✖ FAIL", tui.Red)
 		} else if check.Warning {
-			badge = tui.BadgeWarn()
+			badge = tui.Badge("▲ WARN", tui.Yellow)
 		}
 
 		fmt.Fprintf(stdout, "  %s  %-*s  %s\n", badge, maxNameWidth, check.Name, check.Message)
@@ -347,7 +347,7 @@ func (c *CmdDoctor) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 		fmt.Fprintf(
 			stdout,
 			"%s\n",
-			tui.Red(fmt.Sprintf("❌ Doctor found %d issue(s) that require attention.", rep.ErrorCount)),
+			tui.Red(fmt.Sprintf("✖ Doctor found %d issue(s) that require attention.", rep.ErrorCount)),
 		)
 
 		return errors.New("workspace doctor checks failed")
@@ -357,10 +357,10 @@ func (c *CmdDoctor) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 		fmt.Fprintf(
 			stdout,
 			"%s\n",
-			tui.Yellow(fmt.Sprintf("⚠️  Doctor found %d warning(s). Workspace is operational.", rep.WarnCount)),
+			tui.Yellow(fmt.Sprintf("▲ Doctor found %d warning(s). Workspace is operational.", rep.WarnCount)),
 		)
 	} else {
-		fmt.Fprintf(stdout, "%s\n", tui.Green("✨ All diagnostic checks passed. Workspace is in pristine condition!"))
+		fmt.Fprintf(stdout, "%s\n", tui.Green("✔ All diagnostic checks passed. Workspace is in pristine condition!"))
 	}
 
 	return nil

@@ -7,8 +7,10 @@ package text
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/lemon4ksan/foundation/silicon/bytesconv"
+	"github.com/lemon4ksan/foundation/tuikit"
 )
 
 // TerminalRenderer converts a [Document] into ANSI colorized terminal output.
@@ -21,28 +23,22 @@ func NewTerminalRenderer() *TerminalRenderer {
 	return &TerminalRenderer{ColorEnabled: true}
 }
 
-// ANSI Escape sequences.
-const (
-	ansiReset     = "\033[0m"
-	ansiBold      = "\033[1m"
-	ansiDim       = "\033[2m"
-	ansiUnderline = "\033[4m"
+func (r *TerminalRenderer) isColorActive() bool {
+	return r.ColorEnabled && tuikit.ColorEnabled()
+}
 
-	ansiRed     = "\033[31m"
-	ansiGreen   = "\033[32m"
-	ansiYellow  = "\033[33m"
-	ansiBlue    = "\033[34m"
-	ansiMagenta = "\033[35m"
-	ansiCyan    = "\033[36m"
-	ansiWhite   = "\033[37m"
-)
-
-func (r *TerminalRenderer) style(code, s string) string {
-	if !r.ColorEnabled || code == "" {
+func (r *TerminalRenderer) style(s string, fns ...func(string) string) string {
+	if !r.isColorActive() || len(fns) == 0 || s == "" {
 		return s
 	}
 
-	return code + s + ansiReset
+	for _, fn := range fns {
+		if fn != nil {
+			s = fn(s)
+		}
+	}
+
+	return s
 }
 
 // Render writes the terminal-formatted representation of doc to w.
@@ -61,11 +57,11 @@ func (r *TerminalRenderer) Render(w io.Writer, doc *Document) error {
 
 			switch n.Level {
 			case 1:
-				fmt.Fprintf(w, "%s\n\n", r.style(ansiBold+ansiWhite+ansiUnderline, title))
+				fmt.Fprintf(w, "%s\n\n", r.style(title, tuikit.Underline, tuikit.White, tuikit.Bold))
 			case 2:
-				fmt.Fprintf(w, "%s\n\n", r.style(ansiBold+ansiCyan, title))
+				fmt.Fprintf(w, "%s\n\n", r.style(title, tuikit.Cyan, tuikit.Bold))
 			default:
-				fmt.Fprintf(w, "%s\n\n", r.style(ansiBold, title))
+				fmt.Fprintf(w, "%s\n\n", r.style(title, tuikit.Bold))
 			}
 
 		case SectionNode:
@@ -74,20 +70,20 @@ func (r *TerminalRenderer) Render(w io.Writer, doc *Document) error {
 				sec = n.Icon + " " + sec
 			}
 
-			fmt.Fprintf(w, "%s\n", r.style(ansiBold+ansiYellow, sec+":"))
+			fmt.Fprintf(w, "%s\n", r.style(sec+":", tuikit.Yellow, tuikit.Bold))
 
 		case ParagraphNode:
 			fmt.Fprintf(w, "%s\n\n", n.Text)
 
 		case FieldNode:
-			key := r.style(ansiBold, n.Key)
+			key := r.style(n.Key, tuikit.Bold)
 			val := n.Value
 
 			switch n.Style {
 			case FieldCode:
-				val = r.style(ansiCyan, "`"+n.Value+"`")
+				val = r.style("`"+n.Value+"`", tuikit.Cyan)
 			case FieldBold:
-				val = r.style(ansiBold, n.Value)
+				val = r.style(n.Value, tuikit.Bold)
 			}
 
 			fmt.Fprintf(w, "  • %s: %s\n", key, val)
@@ -95,9 +91,9 @@ func (r *TerminalRenderer) Render(w io.Writer, doc *Document) error {
 		case ListNode:
 			for idx, item := range n.Items {
 				if n.Kind == ListNumbered {
-					fmt.Fprintf(w, "  %s %s\n", r.style(ansiDim, fmt.Sprintf("%d.", idx+1)), item)
+					fmt.Fprintf(w, "  %s %s\n", r.style(fmt.Sprintf("%d.", idx+1), tuikit.Dim), item)
 				} else {
-					fmt.Fprintf(w, "  %s %s\n", r.style(ansiCyan, "•"), item)
+					fmt.Fprintf(w, "  %s %s\n", r.style("•", tuikit.Cyan), item)
 				}
 			}
 
@@ -107,23 +103,27 @@ func (r *TerminalRenderer) Render(w io.Writer, doc *Document) error {
 			r.renderCallout(w, n)
 
 		case CodeBlockNode:
-			fmt.Fprintf(w, "  %s\n", r.style(ansiDim, "┌── "+n.Language))
+			fmt.Fprintf(w, "  %s\n", r.style("┌── "+n.Language, tuikit.Dim))
 
 			for line := range bytesconv.ScanTokens(n.Code, '\n') {
-				fmt.Fprintf(w, "  %s %s\n", r.style(ansiDim, "│"), r.style(ansiCyan, line))
+				fmt.Fprintf(w, "  %s %s\n", r.style("│", tuikit.Dim), r.style(line, tuikit.Cyan))
 			}
 
-			fmt.Fprintf(w, "  %s\n\n", r.style(ansiDim, "└──"))
+			fmt.Fprintf(w, "  %s\n\n", r.style("└──", tuikit.Dim))
 
 		case QuoteNode:
 			for line := range bytesconv.ScanTokens(n.Text, '\n') {
-				fmt.Fprintf(w, "  %s %s\n", r.style(ansiDim, "▎"), r.style(ansiDim, line))
+				fmt.Fprintf(w, "  %s %s\n", r.style("▎", tuikit.Dim), r.style(line, tuikit.Dim))
 			}
 
 			fmt.Fprintln(w)
 
 		case DividerNode:
-			fmt.Fprintf(w, "%s\n\n", r.style(ansiDim, "────────────────────────────────────────"))
+			if r.isColorActive() {
+				fmt.Fprintf(w, "%s\n\n", tuikit.RenderDivider(72))
+			} else {
+				fmt.Fprintf(w, "%s\n\n", strings.Repeat("─", 72))
+			}
 
 		case TableNode:
 			r.renderTable(w, n)
@@ -143,18 +143,18 @@ func (r *TerminalRenderer) Render(w io.Writer, doc *Document) error {
 }
 
 func (r *TerminalRenderer) renderCallout(w io.Writer, n CalloutNode) {
-	color := ansiBlue
+	colorFn := tuikit.Cyan
 	switch n.Intent {
 	case IntentSuccess:
-		color = ansiGreen
+		colorFn = tuikit.Green
 	case IntentWarning:
-		color = ansiYellow
+		colorFn = tuikit.Yellow
 	case IntentDanger:
-		color = ansiRed
+		colorFn = tuikit.Red
 	case IntentInfo:
-		color = ansiBlue
+		colorFn = tuikit.Cyan
 	case IntentMuted:
-		color = ansiDim
+		colorFn = tuikit.Gray
 	}
 
 	title := n.Title
@@ -162,15 +162,38 @@ func (r *TerminalRenderer) renderCallout(w io.Writer, n CalloutNode) {
 		title = icon + " " + title
 	}
 
-	fmt.Fprintf(w, "%s %s\n", r.style(ansiBold+color, "▍"), r.style(ansiBold+color, title))
+	styledTitle := r.style(title, colorFn)
+
+	box := tuikit.NewBox(styledTitle, 0).
+		SetStyle(tuikit.BorderRounded).
+		SetIndent(2)
 
 	if n.Body != "" {
 		for line := range bytesconv.ScanTokens(n.Body, '\n') {
-			fmt.Fprintf(w, "%s   %s\n", r.style(color, "▍"), line)
+			box.AddLine(line)
 		}
 	}
 
+	if !r.isColorActive() {
+		var buf strings.Builder
+		_ = box.Render(&buf)
+		_, _ = io.WriteString(w, tuikit.StripANSI(buf.String()))
+	} else {
+		_ = box.Render(w)
+	}
+
 	fmt.Fprintln(w)
+}
+
+func toTuikitAlign(a Align) tuikit.Alignment {
+	switch a {
+	case AlignRight:
+		return tuikit.AlignRight
+	case AlignCenter:
+		return tuikit.AlignCenter
+	default:
+		return tuikit.AlignLeft
+	}
 }
 
 func (r *TerminalRenderer) renderTable(w io.Writer, t TableNode) {
@@ -178,38 +201,22 @@ func (r *TerminalRenderer) renderTable(w io.Writer, t TableNode) {
 		return
 	}
 
-	colWidths := make([]int, len(t.Headers))
-	for i, h := range t.Headers {
-		colWidths[i] = len(h)
+	tbl := tuikit.NewTable(t.Headers...).SetIndent(2)
+
+	for i, align := range t.Aligns {
+		tbl.SetAlignment(i, toTuikitAlign(align))
 	}
 
 	for _, row := range t.Rows {
-		for i, cell := range row {
-			if i < len(colWidths) && len(cell) > colWidths[i] {
-				colWidths[i] = len(cell)
-			}
-		}
+		tbl.AddRow(row...)
 	}
 
-	// Print headers
-	for i, h := range t.Headers {
-		fmt.Fprintf(w, "%s  ", r.style(ansiBold+ansiUnderline, fmt.Sprintf("%-*s", colWidths[i], h)))
-	}
-
-	fmt.Fprintln(w)
-
-	// Print rows
-	for _, row := range t.Rows {
-		for i := range t.Headers {
-			cell := ""
-			if i < len(row) {
-				cell = row[i]
-			}
-
-			fmt.Fprintf(w, "%-*s  ", colWidths[i], cell)
-		}
-
-		fmt.Fprintln(w)
+	if !r.isColorActive() {
+		var buf strings.Builder
+		_ = tbl.Render(&buf)
+		_, _ = io.WriteString(w, tuikit.StripANSI(buf.String()))
+	} else {
+		_ = tbl.Render(w)
 	}
 
 	fmt.Fprintln(w)

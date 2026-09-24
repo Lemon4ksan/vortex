@@ -296,7 +296,7 @@ func (c *CmdInit) runWorkspaceInit(targetDir string, force bool, exclude, match 
 	}
 
 	if len(cfg.Contracts) == 0 {
-		fmt.Fprintf(stdout, "\n💡 Tip: Scaffold your first API package with:\n")
+		fmt.Fprintf(stdout, "\n↳ Tip: Scaffold your first API package with:\n")
 		fmt.Fprintf(stdout, "   vortex init billing        # REST CRUD API\n")
 		fmt.Fprintf(stdout, "   vortex init chat -tpl=ws   # WebSocket Client\n")
 		fmt.Fprintf(stdout, "   vortex init -from=spec.json# Ingest OpenAPI/HAR\n")

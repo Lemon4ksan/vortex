@@ -11,8 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/lemon4ksan/foundation/ast/js"
-
+	"github.com/lemon4ksan/vortex/ast/js"
 	"github.com/lemon4ksan/vortex/pkg/oracle/spec"
 )
 
@@ -661,7 +660,7 @@ func buildHTTPServerStmt(s *spec.OracleSpec) js.Stmt {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-  console.log(`+"`🤖 Vortex Universal Oracle [%q] listening on http://127.0.0.1:${PORT}`"+`);
+  console.log(`+"`◆ Vortex Universal Oracle [%q] listening on http://127.0.0.1:${PORT}`"+`);
   initBrowser().catch(err => {
     console.log('[oracle] background init notice:', err.message);
   });

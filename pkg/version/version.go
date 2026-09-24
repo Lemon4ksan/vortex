@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package version defines the unified single source of truth for Aoni release versions.
 package version
 
 // Current is the complete semantic release version string with 'v' prefix.

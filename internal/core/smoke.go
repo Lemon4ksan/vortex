@@ -242,7 +242,7 @@ func (c *CmdSmoke) Run(ctx context.Context, args []string, stdout, stderr io.Wri
 	}
 
 	doc := text.NewDocument().
-		Title("⚡", "Live Endpoint Smoke Probe")
+		Title("◆", "Live Endpoint Smoke Probe")
 	defer doc.Release()
 
 	headers := []string{"SERVICE", "VERB", "ENDPOINT", "STATUS", "LATENCY", "TLS"}

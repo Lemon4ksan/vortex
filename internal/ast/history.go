@@ -97,7 +97,7 @@ func (c *CmdHistory) Run(ctx context.Context, args []string, stdout, stderr io.W
 		return nil
 	}
 
-	fmt.Fprintf(stdout, "⚡ Vortex Operation History Journal (%s)\n\n", targetDir)
+	fmt.Fprintf(stdout, "◆ Vortex Operation History Journal (%s)\n\n", targetDir)
 
 	if len(entries) == 0 {
 		fmt.Fprintf(stdout, "No operations recorded yet. All modifying operations are automatically tracked here.\n")

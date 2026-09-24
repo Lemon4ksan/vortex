@@ -382,7 +382,7 @@ func TestApp_Log_Git_Flag(t *testing.T) {
 	// Log with --git flag on local file
 	err := app.Run(context.Background(), []string{"ast", "log", "--git", "-n=3", "main.go"})
 	require.NoError(t, err)
-	require.Contains(t, stdout.String(), "⚡ Vortex API Git History")
+	require.Contains(t, stdout.String(), "◆ Vortex API Git History")
 }
 
 func TestApp_Diff_Against_HEAD(t *testing.T) {
@@ -393,7 +393,7 @@ func TestApp_Diff_Against_HEAD(t *testing.T) {
 	// Diff with --against=HEAD on local file
 	err := app.Run(context.Background(), []string{"traffic", "diff", "--against=HEAD", "main.go"})
 	require.NoError(t, err)
-	require.Contains(t, stdout.String(), "⚡ [vortex diff]")
+	require.Contains(t, stdout.String(), "◆ [vortex diff]")
 }
 
 func TestApp_AutoPilot_EmptyWorkspace(t *testing.T) {
@@ -449,7 +449,7 @@ type DemoAPI interface {
 	// Run with no args (default auto-pilot) in active workspace
 	err = app.Run(context.Background(), nil)
 	require.NoError(t, err)
-	require.Contains(t, stdout.String(), "⚡ Vortex Auto-Pilot: Audit & Build Pipeline")
+	require.Contains(t, stdout.String(), "◆ Vortex Auto-Pilot: Audit & Build Pipeline")
 	require.Contains(t, stdout.String(), "Pre-flight Contract Audit")
 	require.Contains(t, stdout.String(), "Code Generation & Polyglot Targets")
 	require.FileExists(t, filepath.Join(pkgDir, "api.gen.go"))
@@ -1725,10 +1725,10 @@ type GenerateContentRequest struct {
 	require.Contains(t, out, "Traffic Diff")
 	require.Contains(t, out, "GenerateContentRequest")
 	require.Contains(t, out, "Field4")
-	require.Contains(t, out, "65536 ➔ 8192")
+	require.Contains(t, out, "65536 ↳ 8192")
 	require.Contains(t, out, "vortex ast rename --type=GenerateContentRequest --field=Field4 --to=<NAME>")
 	require.Contains(t, out, "Field5")
-	require.Contains(t, out, "0.7 ➔ 1")
+	require.Contains(t, out, "0.7 ↳ 1")
 }
 
 func TestApp_AST_FieldRename(t *testing.T) {
@@ -1957,9 +1957,9 @@ type Req struct {
 	require.NoError(t, err)
 
 	adjDiff := stdout.String()
-	require.Contains(t, adjDiff, "Field4 ➔ MaxTokens")
-	require.Contains(t, adjDiff, "RPCMethod1 ➔ GenerateContent")
-	require.NotContains(t, adjDiff, "Field0 ➔ ModelName") // Happened in Frame 1, not Frame 2
+	require.Contains(t, adjDiff, "Field4 ↳ MaxTokens")
+	require.Contains(t, adjDiff, "RPCMethod1 ↳ GenerateContent")
+	require.NotContains(t, adjDiff, "Field0 ↳ ModelName") // Happened in Frame 1, not Frame 2
 
 	// 6. Test stack diff --cumulative (Frame 2 vs Frame 0)
 	stdout.Reset()
@@ -1968,9 +1968,9 @@ type Req struct {
 	require.NoError(t, err)
 
 	cumDiff := stdout.String()
-	require.Contains(t, cumDiff, "Field0 ➔ ModelName")
-	require.Contains(t, cumDiff, "Field4 ➔ MaxTokens")
-	require.Contains(t, cumDiff, "RPCMethod1 ➔ GenerateContent")
+	require.Contains(t, cumDiff, "Field0 ↳ ModelName")
+	require.Contains(t, cumDiff, "Field4 ↳ MaxTokens")
+	require.Contains(t, cumDiff, "RPCMethod1 ↳ GenerateContent")
 
 	// 7. Test stack restore base
 	stdout.Reset()

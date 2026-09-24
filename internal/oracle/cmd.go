@@ -131,7 +131,7 @@ func (c *Cmd) Run(_ context.Context, args []string, stdout, stderr io.Writer) er
 		},
 	}
 
-	fmt.Fprintf(stdout, "⚡ Compiling Vortex Oracle [%s] -> %s\n", oracleSpec.Name, oracleSpec.TargetURL)
+	fmt.Fprintf(stdout, "◆ Compiling Vortex Oracle [%s] -> %s\n", oracleSpec.Name, oracleSpec.TargetURL)
 
 	// 1. Generate JS Sidecar
 	jsBytes, err := gen.GenerateJS(oracleSpec)
@@ -164,7 +164,7 @@ func (c *Cmd) Run(_ context.Context, args []string, stdout, stderr io.Writer) er
 	}
 
 	fmt.Fprintf(stdout, "✔ Generated Go contract: %s (%d bytes)\n", goOut, len(goBytes))
-	fmt.Fprintf(stdout, "✨ Vortex Oracle compilation finished successfully!\n")
+	fmt.Fprintf(stdout, "✔ Vortex Oracle compilation finished successfully!\n")
 
 	return nil
 }

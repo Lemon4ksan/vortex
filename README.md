@@ -20,8 +20,6 @@ _«A little copying is better than a little dependency — own your network cont
 
 </div>
 
----
-
 ## The Vortex Manifesto: Sovereign Clients
 
 For over two decades, network client development in software engineering has suffered from fragmentation:
@@ -31,8 +29,6 @@ For over two decades, network client development in software engineering has suf
 * When upstream platforms update internal endpoints, engineering teams are blocked waiting for external maintainers.
 
 **The Sovereign Paradigm**: No engineering team should ever depend on third-party API wrapper libraries. Every production project must own its sovereign, zero-allocation API client generated directly into its own codebase (`pkg/api/`) from Go AST contracts, OpenAPI schemas, or live network traffic captures (`.har`).
-
----
 
 ## Key Capabilities
 
@@ -48,8 +44,6 @@ For over two decades, network client development in software engineering has suf
 | **AST Borrow Checker** | Verifies zero-allocation constraints and memory lifetimes across contract code. | `vortex borrow` |
 | **Silicon Benchmarking** | Measures throughput, allocations, and CPU profiles against production baselines. | `vortex bench` |
 
----
-
 ## Installation
 
 `vortex` requires Go version `1.27` or higher.
@@ -62,8 +56,6 @@ Verify installation:
 ```bash
 vortex --version
 ```
-
----
 
 ## Workflow & Examples
 
@@ -143,8 +135,6 @@ Generate a zero-dependency, in-memory mock HTTP server for integration testing:
 vortex mock ./pkg/api/github_service.go -out=./pkg/api/mock_test.go
 ```
 
----
-
 ## CLI Command Reference
 
 ### Daily Core Commands
@@ -181,8 +171,6 @@ vortex explain @aoni:cache             # Display documentation and examples for 
 vortex clean                           # Clean generated artifacts, profiles, and harnesses
 ```
 
----
-
 ## Architecture: The 6-Layer Engine
 
 ```
@@ -210,8 +198,6 @@ vortex clean                           # Clean generated artifacts, profiles, an
        | 6. Silicon Sympathy: 64-Byte Cache Lines, SIMD, Arenas      |
        +-------------------------------------------------------------+
 ```
-
----
 
 ## License
 

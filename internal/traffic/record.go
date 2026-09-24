@@ -41,7 +41,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/lemon4ksan/foundation/codec/compress/brotli"
-	"github.com/lemon4ksan/foundation/net/http/header"
+	"github.com/lemon4ksan/mach/proto/http/header"
 )
 
 // CmdRecord captures live HTTP/HTTPS traffic from applications into standard W3C HAR 1.2 files.
@@ -566,9 +566,9 @@ func (c *CmdRecord) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 		proxyURL := fmt.Sprintf("http://127.0.0.1:%d", actualPort)
 
 		if !isQuiet {
-			fmt.Fprintf(stderr, "⚡ Vortex Process Traffic Sniffer active (proxy: %s)\n", proxyURL)
-			fmt.Fprintf(stderr, "⚡ Spawning isolated subprocess: %s\n", strings.Join(cmdToRun, " "))
-			fmt.Fprintf(stderr, "⚡ Recording output to: %s\n", *outFlag)
+			fmt.Fprintf(stderr, "◆ Vortex Process Traffic Sniffer active (proxy: %s)\n", proxyURL)
+			fmt.Fprintf(stderr, "◆ Spawning isolated subprocess: %s\n", strings.Join(cmdToRun, " "))
+			fmt.Fprintf(stderr, "◆ Recording output to: %s\n", *outFlag)
 			fmt.Fprintln(stderr, "────────────────────────────────────────────────────────────────────────")
 		}
 
@@ -615,13 +615,13 @@ func (c *CmdRecord) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 		if *waitFlag || (runDuration < 4*time.Second && len(recorder.entries) == 0) {
 			fmt.Fprintf(
 				stdout,
-				"\n⚡ Launcher process completed in %v (background app is likely running).\n",
+				"\n◆ Launcher process completed in %v (background app is likely running).\n",
 				runDuration.Round(time.Millisecond),
 			)
-			fmt.Fprintf(stdout, "⚡ Recorder proxy is ACTIVE on %s (isolated to this process tree)\n", proxyURL)
+			fmt.Fprintf(stdout, "◆ Recorder proxy is ACTIVE on %s (isolated to this process tree)\n", proxyURL)
 			fmt.Fprintf(
 				stdout,
-				"👉 Use your application normally. When finished, press [ENTER] here to save %s...\n",
+				"↳ Use your application normally. When finished, press [ENTER] here to save %s...\n",
 				*outFlag,
 			)
 
@@ -659,7 +659,7 @@ func (c *CmdRecord) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 			len(recorder.entries),
 			*outFlag,
 		)
-		fmt.Fprintf(stdout, "👉 Next: Synthesize Go contract & Mock Server:\n")
+		fmt.Fprintf(stdout, "↳ Next: Synthesize Go contract & Mock Server:\n")
 		fmt.Fprintf(stdout, "   vortex init -from-har=\"%s\" -pkg=api -service=API -out=api.go\n", *outFlag)
 		fmt.Fprintf(stdout, "   vortex gen api.go\n")
 		fmt.Fprintf(stdout, "   vortex mock api.go\n")
@@ -680,8 +680,8 @@ func (c *CmdRecord) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, os.Interrupt, syscall.SIGTERM)
 
-	fmt.Fprintf(stdout, "⚡ Vortex Traffic Recorder active on http://127.0.0.1:%d\n", actualPort)
-	fmt.Fprintf(stdout, "⚡ Capturing live transactions to %s (Press Ctrl+C to stop)\n\n", *outFlag)
+	fmt.Fprintf(stdout, "◆ Vortex Traffic Recorder active on http://127.0.0.1:%d\n", actualPort)
+	fmt.Fprintf(stdout, "◆ Capturing live transactions to %s (Press Ctrl+C to stop)\n\n", *outFlag)
 	fmt.Fprintf(stdout, "Usage in another terminal:\n")
 	fmt.Fprintf(
 		stdout,
@@ -696,7 +696,7 @@ func (c *CmdRecord) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 	case sErr := <-serverErrChan:
 		return fmt.Errorf("proxy listener error: %w", sErr)
 	case <-sigChan:
-		fmt.Fprintf(stdout, "\n⚡ Stopping traffic recorder and flushing %s...\n", *outFlag)
+		fmt.Fprintf(stdout, "\n◆ Stopping traffic recorder and flushing %s...\n", *outFlag)
 	case <-ctx.Done():
 	}
 
@@ -707,7 +707,7 @@ func (c *CmdRecord) Run(ctx context.Context, args []string, stdout, stderr io.Wr
 	_ = recorder.save()
 
 	fmt.Fprintf(stdout, "✔ Saved %d transaction(s) to %s\n\n", len(recorder.entries), *outFlag)
-	fmt.Fprintf(stdout, "👉 Next step: Generate Go client contract and Mock Server:\n")
+	fmt.Fprintf(stdout, "↳ Next step: Generate Go client contract and Mock Server:\n")
 	fmt.Fprintf(stdout, "   vortex init -from-har=\"%s\" -pkg=api -service=API -out=api.go\n", *outFlag)
 	fmt.Fprintf(stdout, "   vortex gen api.go\n")
 	fmt.Fprintf(stdout, "   vortex mock api.go\n")

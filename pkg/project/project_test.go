@@ -349,7 +349,7 @@ func TestProject_StatusRenderAlignment(t *testing.T) {
 	rendered := report.Render(false)
 
 	// Check headers and summary
-	require.Contains(t, rendered, "⚡ Vortex API Guardian")
+	require.Contains(t, rendered, "◆ Vortex API Guardian")
 	require.Contains(t, rendered, "Workspace: D:/CodingProjects/g-man (4 services, 268 methods)")
 	require.Contains(t, rendered, "● Contracts & Generated Code:")
 
