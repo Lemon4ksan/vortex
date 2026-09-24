@@ -26,7 +26,7 @@ func emitStatusRoutingExecution(
 	tracker.Add("fmt")
 	tracker.Add("net/http")
 	tracker.Add("github.com/lemon4ksan/aoni")
-	tracker.Add("github.com/lemon4ksan/aoni/x/codec/decode")
+	tracker.Add("github.com/lemon4ksan/aoni/codec/decode")
 
 	methodVerb := m.HTTPMethod
 	if methodVerb == "" {

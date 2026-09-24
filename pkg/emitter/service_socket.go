@@ -68,7 +68,7 @@ func emitEventMethod(
 				return
 
 			case ir.StageJSON:
-				tracker.Add("github.com/lemon4ksan/aoni/x/codec/decode")
+				tracker.Add("github.com/lemon4ksan/aoni/codec/decode")
 
 				isPtr := strings.HasPrefix(handlerElemType, "*")
 				baseType := strings.TrimPrefix(handlerElemType, "*")
@@ -100,7 +100,7 @@ func emitEventMethod(
 				return
 
 			default:
-				tracker.Add("github.com/lemon4ksan/aoni/x/codec/extract")
+				tracker.Add("github.com/lemon4ksan/aoni/codec/extract")
 				fmt.Fprintf(
 					buf,
 					"\t\tstageOut%d, err := extract.Attr(stageIn, %q, %q)\n",

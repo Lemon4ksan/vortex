@@ -7,7 +7,7 @@ package inspector
 import (
 	"net/http"
 
-	"github.com/lemon4ksan/aoni/x/telemetry"
+	"github.com/lemon4ksan/aoni/telemetry"
 )
 
 // MultiInspector wraps multiple [telemetry.TrafficInspector] instances into a multi-broadcaster.
