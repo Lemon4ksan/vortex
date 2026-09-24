@@ -239,8 +239,8 @@ func emitBodyVerbExecution(
 func emitReturnPipeline(buf *bytes.Buffer, tracker *ImportTracker, m *ir.MethodIR, targetReq, rawPath string) {
 	tracker.Add("io")
 	tracker.Add("net/http")
-	tracker.Add("github.com/lemon4ksan/aoni/x/codec/decode")
-	tracker.Add("github.com/lemon4ksan/aoni/x/codec/extract")
+	tracker.Add("github.com/lemon4ksan/aoni/codec/decode")
+	tracker.Add("github.com/lemon4ksan/aoni/codec/extract")
 
 	methodVerb := m.HTTPMethod
 	if methodVerb == "" {

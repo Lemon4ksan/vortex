@@ -199,11 +199,11 @@ func (t *ImportTracker) RegisterRootImports(root *ir.RootIR, bodyCode string) {
 	}
 
 	if hasDecode {
-		t.Add("github.com/lemon4ksan/aoni/x/codec/decode")
+		t.Add("github.com/lemon4ksan/aoni/codec/decode")
 	}
 
 	if hasCodec {
-		t.Add("github.com/lemon4ksan/aoni/x/codec")
+		t.Add("github.com/lemon4ksan/aoni/codec")
 	}
 
 	if hasProto {
